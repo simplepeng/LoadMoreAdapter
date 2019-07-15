@@ -2,12 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:orientation="vertical">
 
     <ProgressBar
+        android:id="@+id/pb"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp" />
+        android:text="加载失败..." />
 </RelativeLayout>

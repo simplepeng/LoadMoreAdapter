@@ -1,6 +1,7 @@
 package me.simple.loadmoreadapter.demo;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import me.drakeet.multitype.Items;
 import me.drakeet.multitype.MultiTypeAdapter;
@@ -33,26 +37,37 @@ public class LinearFragment extends Fragment {
 
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter);
-        loadMoreAdapter.addLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                addData();
-            }
-        });
+        LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
+                .addLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
+                    @Override
+                    public void onLoadMore(LoadMoreAdapter adapter) {
+                        addData(adapter);
+                    }
+                });
         rv.setAdapter(loadMoreAdapter);
 
-        addData();
+        addData(loadMoreAdapter);
     }
 
-    private void addData() {
-        mItems.add("Java");
-        mItems.add("Kotlin");
-        mItems.add("C++");
-        mItems.add("Go");
-        mItems.add("Ruby");
-        mItems.add("Python");
-        mItems.add("Rust");
-        mAdapter.notifyItemRangeInserted(mItems.size() - 7, 7);
+    private void addData(final LoadMoreAdapter adapter) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                adapter.loadComplete();
+                List<String> items = new ArrayList<>();
+                items.add("Java");
+                items.add("Kotlin");
+                items.add("C++");
+                items.add("Go");
+                items.add("Ruby");
+                mItems.addAll(items);
+                mAdapter.notifyItemRangeInserted(mItems.size() - items.size(), items.size());
+//                mAdapter.notifyDataSetChanged();
+
+                if (mItems.size() > 20) {
+                    adapter.noMoreData();
+                }
+            }
+        },1000);
     }
 }
