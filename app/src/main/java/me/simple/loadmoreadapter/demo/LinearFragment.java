@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import me.drakeet.multitype.Items;
 import me.drakeet.multitype.MultiTypeAdapter;
+import me.simple.loadmoreadapter.LoadMoreAdapter;
 
 public class LinearFragment extends Fragment {
 
@@ -32,7 +33,14 @@ public class LinearFragment extends Fragment {
 
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        rv.setAdapter(mAdapter);
+        LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter);
+        loadMoreAdapter.addLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                addData();
+            }
+        });
+        rv.setAdapter(loadMoreAdapter);
 
         addData();
     }

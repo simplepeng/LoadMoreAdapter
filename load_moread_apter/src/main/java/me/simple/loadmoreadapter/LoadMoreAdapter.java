@@ -1,18 +1,35 @@
 package me.simple.loadmoreadapter;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
     private int TYPE_LOAD_MORE = 1111;
+    /**
+     *
+     */
+    private OnLoadMoreListener onLoadMoreListener;
 
-    public LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
+    /**
+     * 是否上拉
+     */
+    public boolean isScrollLoadMore = false;
+
+    public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
+        return new LoadMoreAdapter(adapter);
+    }
+
+    private LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
         if (adapter == null) {
             throw new NullPointerException("adapter can not be null");
         }
@@ -22,6 +39,9 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
+        if (position == getItemCount() - 1) {
+            return TYPE_LOAD_MORE;
+        }
         return super.getItemViewType(position);
     }
 
@@ -71,15 +91,52 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         recyclerView.removeOnScrollListener(mOnScrollListener);
     }
 
+    public interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+
+    public void addLoadMoreListener(OnLoadMoreListener listener) {
+        this.onLoadMoreListener = listener;
+    }
+
     private RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
+
+            if (newState != RecyclerView.SCROLL_STATE_IDLE || !isScrollLoadMore
+                    || onLoadMoreListener == null) return;
+
+            if (canLoadMore(recyclerView.getLayoutManager())) {
+                onLoadMoreListener.onLoadMore();
+            }
         }
 
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
+            isScrollLoadMore = dx > 0;
         }
     };
+
+    private boolean canLoadMore(final RecyclerView.LayoutManager layoutManager) {
+        boolean canLoadMore = false;
+        if (layoutManager instanceof GridLayoutManager) {
+            canLoadMore = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1;
+        } else if (layoutManager instanceof LinearLayoutManager) {
+            canLoadMore = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1;
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            StaggeredGridLayoutManager sgLayoutManager = ((StaggeredGridLayoutManager) layoutManager);
+            int[] into = new int[sgLayoutManager.getSpanCount()];
+            int[] lastVisibleItemPositions = sgLayoutManager.findLastVisibleItemPositions(into);
+            int lastPosition = lastVisibleItemPositions[0];
+            for (int value : into) {
+                if (value > lastPosition) {
+                    lastPosition = value;
+                }
+            }
+            canLoadMore = lastPosition >= layoutManager.getItemCount() - 1;
+        }
+        return canLoadMore;
+    }
 }
