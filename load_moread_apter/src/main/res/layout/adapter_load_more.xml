@@ -7,13 +7,13 @@
     android:orientation="vertical">
 
     <ProgressBar
-        android:id="@+id/pb"
+        android:id="@+id/load_more_pb"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_centerInParent="true"/>
 
     <TextView
-        android:id="@+id/tv"
+        android:id="@+id/load_more_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

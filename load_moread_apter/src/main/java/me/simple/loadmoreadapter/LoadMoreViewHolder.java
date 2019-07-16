@@ -5,15 +5,13 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class LoadMoreVH extends RecyclerView.ViewHolder implements ILoadMore {
+public class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
 
-    ProgressBar pb;
-    TextView tv;
+    private AbsLoadMoreFooter mFooter;
 
-    public LoadMoreVH(View itemView) {
+    public LoadMoreViewHolder(View itemView, AbsLoadMoreFooter mFooter) {
         super(itemView);
-        pb = itemView.findViewById(R.id.pb);
-        tv = itemView.findViewById(R.id.tv);
+        this.mFooter = mFooter;
     }
 
     public void setState(int stateType) {
@@ -35,31 +33,21 @@ public class LoadMoreVH extends RecyclerView.ViewHolder implements ILoadMore {
 
     @Override
     public void loading() {
-        pb.setVisibility(View.VISIBLE);
-        tv.setVisibility(View.GONE);
+        mFooter.loading();
     }
 
     @Override
     public void loadComplete() {
-        pb.setVisibility(View.GONE);
-        tv.setVisibility(View.VISIBLE);
-
-        tv.setText("加载完成");
+        mFooter.loadComplete();
     }
 
     @Override
     public void noMoreData() {
-        pb.setVisibility(View.GONE);
-        tv.setVisibility(View.VISIBLE);
-
-        tv.setText("已无更多数据");
+        mFooter.noMoreData();
     }
 
     @Override
     public void loadFailed() {
-        pb.setVisibility(View.GONE);
-        tv.setVisibility(View.VISIBLE);
-
-        tv.setText("加载失败");
+        mFooter.loadFailed();
     }
 }

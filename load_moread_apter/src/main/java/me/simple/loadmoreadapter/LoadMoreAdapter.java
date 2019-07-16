@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -45,15 +46,26 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      */
     private RecyclerView mRecyclerView;
 
+    private AbsLoadMoreFooter mFooter;
+
     public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
         return new LoadMoreAdapter(adapter);
     }
 
+    public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, AbsLoadMoreFooter footer) {
+        return new LoadMoreAdapter(adapter, footer);
+    }
+
     private LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
+        this(adapter, new LoadMoreFooter());
+    }
+
+    private LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, AbsLoadMoreFooter footer) {
         if (adapter == null) {
             throw new NullPointerException("adapter can not be null");
         }
         this.adapter = adapter;
+        this.mFooter = footer;
     }
 
     @Override
@@ -83,8 +95,10 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 //        Log("onCreateViewHolder ---> " + viewType);
         if (viewType == VIEW_TYPE_LOAD_MORE) {
-            return new LoadMoreVH(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.adapter_load_more, parent, false));
+            final View footView = LayoutInflater.from(parent.getContext())
+                    .inflate(mFooter.setLayoutRes(), parent, false);
+            mFooter.onCreate(footView);
+            return new LoadMoreViewHolder(footView, mFooter);
         }
         return adapter.onCreateViewHolder(parent, viewType);
     }
@@ -98,11 +112,11 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
 //        Log("onBindViewHolder ----> " + holder.getClass().getSimpleName() +
 //                " ---- position == " + position);
-        if (holder instanceof LoadMoreVH) {
-            final LoadMoreVH loadMoreVH = (LoadMoreVH) holder;
-            loadMoreVH.setState(stateType);
+        if (holder instanceof LoadMoreViewHolder) {
+            final LoadMoreViewHolder loadMoreViewHolder = (LoadMoreViewHolder) holder;
+            loadMoreViewHolder.setState(stateType);
             if (!mRecyclerView.canScrollVertically(-1) && onLoadMoreListener != null) {
-                loadMoreVH.setState(STATE_LOADING);
+                loadMoreViewHolder.setState(STATE_LOADING);
                 onLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
             }
         } else {
@@ -130,25 +144,25 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder instanceof LoadMoreVH) return;
+        if (holder instanceof LoadMoreViewHolder) return;
         adapter.onViewAttachedToWindow(holder);
     }
 
     @Override
     public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder instanceof LoadMoreVH) return;
+        if (holder instanceof LoadMoreViewHolder) return;
         adapter.onViewDetachedFromWindow(holder);
     }
 
     @Override
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder instanceof LoadMoreVH) return;
+        if (holder instanceof LoadMoreViewHolder) return;
         adapter.onViewRecycled(holder);
     }
 
     @Override
     public boolean onFailedToRecycleView(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder instanceof LoadMoreVH) return false;
+        if (holder instanceof LoadMoreViewHolder) return false;
         return adapter.onFailedToRecycleView(holder);
     }
 
