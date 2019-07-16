@@ -34,8 +34,9 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static final int TYPE_LOAD_FAILED = 2;
     public static final int TYPE_NO_MORE_DATA = 3;
     private int stateType = TYPE_LOADING;
+
     /**
-     *
+     * 已无更多数据
      */
     private boolean noMoreData = false;
 
@@ -51,7 +52,19 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
+    public int getItemCount() {
+        int count = adapter.getItemCount();
+        return count > 0 ? count + 1 : 0;
+    }
+
+//    @Override
+//    public long getItemId(int position) {
+//        return adapter.getItemId(position);
+//    }
+
+    @Override
     public int getItemViewType(int position) {
+        if (position <= 0) return super.getItemViewType(position);
         if (position == getItemCount() - 1) {
             return VIEW_TYPE_LOAD_MORE;
         }
@@ -75,8 +88,9 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
-        Log.d("LoadMoreAdapter", "onBindViewHolder ----> " + holder.getClass().getSimpleName());
-        if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE) {
+        Log("onBindViewHolder ----> " + holder.getClass().getSimpleName() +
+                " ---- position == " + position);
+        if (holder instanceof LoadMoreVH) {
             ((LoadMoreVH) holder).setState(stateType);
         } else {
             adapter.onBindViewHolder(holder, position, payloads);
@@ -84,29 +98,44 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public int getItemCount() {
-        int count = adapter.getItemCount();
-        return count + 1;
-    }
-
-    @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
         adapter.registerAdapterDataObserver(dataObserver);
         recyclerView.addOnScrollListener(mOnScrollListener);
+
+        adapter.onAttachedToRecyclerView(recyclerView);
     }
 
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
         adapter.unregisterAdapterDataObserver(dataObserver);
         recyclerView.removeOnScrollListener(mOnScrollListener);
+
+        adapter.onDetachedFromRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        adapter.onViewAttachedToWindow(holder);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+        adapter.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        adapter.onViewRecycled(holder);
+    }
+
+    @Override
+    public boolean onFailedToRecycleView(@NonNull RecyclerView.ViewHolder holder) {
+        return adapter.onFailedToRecycleView(holder);
     }
 
     private RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onChanged() {
-            super.onChanged();
             LoadMoreAdapter.this.notifyDataSetChanged();
         }
 
@@ -156,7 +185,6 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (canLoadMore(recyclerView.getLayoutManager())) {
                 loading();
-                Log.d(LoadMoreAdapter.this.getClass().getSimpleName(), "loading");
                 onLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
             }
         }
@@ -218,6 +246,11 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void notifyLoadMoreVH() {
-        notifyItemChanged(getItemCount() - 1);
+        if (getItemCount() <= 0) return;
+        LoadMoreAdapter.this.notifyItemChanged(getItemCount() - 1);
+    }
+
+    private void Log(String text) {
+        Log.d("LoadMoreAdapter", text);
     }
 }

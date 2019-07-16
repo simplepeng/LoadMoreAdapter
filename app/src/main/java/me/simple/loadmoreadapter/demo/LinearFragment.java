@@ -53,21 +53,25 @@ public class LinearFragment extends Fragment {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 adapter.loadComplete();
-                List<String> items = new ArrayList<>();
-                items.add("Java");
-                items.add("Kotlin");
-                items.add("C++");
-                items.add("Go");
-                items.add("Ruby");
-                mItems.addAll(items);
-                mAdapter.notifyItemRangeInserted(mItems.size() - items.size(), items.size());
-//                mAdapter.notifyDataSetChanged();
+
+//                mItems.add("1");
+//                mItems.add("2");
+//                mItems.add("3");
+//                mItems.add("4");
+//                mItems.add("5");
+                mItems.add("Java");
+                mItems.add("Kotlin");
+                mItems.add("C++");
+                mItems.add("Go");
+                mItems.add("Ruby");
+                mAdapter.notifyDataSetChanged();
 
                 if (mItems.size() > 20) {
                     adapter.noMoreData();
                 }
             }
-        },1000);
+        }, 1000);
     }
 }
