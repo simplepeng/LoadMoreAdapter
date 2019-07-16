@@ -4,7 +4,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class LoadMoreFooter extends AbsLoadMoreFooter {
+class LoadMoreFooter extends AbsLoadMoreFooter {
 
     private ProgressBar mProgressBar;
     private TextView mTextView;

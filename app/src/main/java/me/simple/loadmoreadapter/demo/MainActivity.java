@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
                 switch (i) {
                     case 0:
                         return new LinearFragment();
+                    case 1:
+                        return new GridFragment();
+                    case 2:
+                        return new StaggeredFragment();
                 }
                 return new LinearFragment();
             }

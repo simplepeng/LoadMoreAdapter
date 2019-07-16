@@ -4,8 +4,14 @@ import android.view.View;
 
 public abstract class AbsLoadMoreFooter {
 
+    /**
+     * 设置footer的布局
+     */
     public abstract int setLayoutRes();
 
+    /**
+     * footer布局初始化完成
+     */
     public abstract void onCreate(View footerView);
 
     /**

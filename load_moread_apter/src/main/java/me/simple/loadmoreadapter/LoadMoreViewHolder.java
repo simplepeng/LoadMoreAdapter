@@ -1,20 +1,26 @@
 package me.simple.loadmoreadapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
+class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
 
     private AbsLoadMoreFooter mFooter;
 
-    public LoadMoreViewHolder(View itemView, AbsLoadMoreFooter mFooter) {
+    LoadMoreViewHolder(View itemView, AbsLoadMoreFooter mFooter) {
         super(itemView);
+        ViewGroup.LayoutParams params = itemView.getLayoutParams();
+        if (params instanceof StaggeredGridLayoutManager.LayoutParams) {
+            ((StaggeredGridLayoutManager.LayoutParams) params).setFullSpan(true);
+        }
         this.mFooter = mFooter;
     }
 
-    public void setState(int stateType) {
+    void setState(int stateType) {
         switch (stateType) {
             case LoadMoreAdapter.STATE_LOADING:
                 loading();

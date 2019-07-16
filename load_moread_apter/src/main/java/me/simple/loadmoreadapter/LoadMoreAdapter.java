@@ -30,10 +30,10 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      *
      */
-    public static final int STATE_LOADING = 0;
-    public static final int STATE_LOAD_COMPLETE = 1;
-    public static final int STATE_LOAD_FAILED = 2;
-    public static final int STATE_NO_MORE_DATA = 3;
+    static final int STATE_LOADING = 0;
+    static final int STATE_LOAD_COMPLETE = 1;
+    static final int STATE_LOAD_FAILED = 2;
+    static final int STATE_NO_MORE_DATA = 3;
     private int stateType = STATE_LOADING;
 
     /**
@@ -127,6 +127,7 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         mRecyclerView = recyclerView;
+        setFullSpan(recyclerView);
         adapter.registerAdapterDataObserver(dataObserver);
         recyclerView.addOnScrollListener(mOnScrollListener);
 
@@ -284,7 +285,28 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         LoadMoreAdapter.this.notifyItemChanged(getItemCount() - 1);
     }
 
+    private void setFullSpan(RecyclerView recyclerView) {
+        final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager == null) return;
+
+        if (layoutManager instanceof GridLayoutManager) {
+            final GridLayoutManager gm = (GridLayoutManager) layoutManager;
+            gm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    int viewType = getItemViewType(position);
+                    if (viewType == VIEW_TYPE_LOAD_MORE) return gm.getSpanCount();
+                    return 1;
+                }
+            });
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            StaggeredGridLayoutManager sgm = (StaggeredGridLayoutManager) layoutManager;
+        }
+    }
+
     private void Log(String text) {
         Log.d("LoadMoreAdapter", text);
     }
+
+
 }
