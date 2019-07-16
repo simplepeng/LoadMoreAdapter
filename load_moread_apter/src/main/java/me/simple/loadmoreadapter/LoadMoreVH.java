@@ -18,16 +18,16 @@ public class LoadMoreVH extends RecyclerView.ViewHolder implements ILoadMore {
 
     public void setState(int stateType) {
         switch (stateType) {
-            case LoadMoreAdapter.TYPE_LOADING:
+            case LoadMoreAdapter.STATE_LOADING:
                 loading();
                 break;
-            case LoadMoreAdapter.TYPE_LOAD_COMPLETE:
+            case LoadMoreAdapter.STATE_LOAD_COMPLETE:
                 loadComplete();
                 break;
-            case LoadMoreAdapter.TYPE_LOAD_FAILED:
+            case LoadMoreAdapter.STATE_LOAD_FAILED:
                 loadFailed();
                 break;
-            case LoadMoreAdapter.TYPE_NO_MORE_DATA:
+            case LoadMoreAdapter.STATE_NO_MORE_DATA:
                 noMoreData();
                 break;
         }

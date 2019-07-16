@@ -66,7 +66,9 @@ public class LinearFragment extends Fragment {
                 mItems.add("C++");
                 mItems.add("Go");
                 mItems.add("Ruby");
-                mAdapter.notifyDataSetChanged();
+//                mAdapter.notifyDataSetChanged();
+//                mAdapter.notifyItemInserted(0);
+                mAdapter.notifyItemRangeInserted(mItems.size() - 5, 5);
 
                 if (mItems.size() > 20) {
                     adapter.noMoreData();
