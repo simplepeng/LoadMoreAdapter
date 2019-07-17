@@ -15,37 +15,48 @@ import java.util.List;
 
 public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
+    /**
+     *
+     */
+    private RecyclerView.Adapter<RecyclerView.ViewHolder> mAdapter;
+    /**
+     *
+     */
     private int VIEW_TYPE_LOAD_MORE = 1111;
     /**
      *
      */
-    private OnLoadMoreListener onLoadMoreListener;
-
+    private OnLoadMoreListener mOnLoadMoreListener;
+    /**
+     *
+     */
+    private OnFailedClickListener mOnFailedClickListener;
     /**
      * 是否为上拉
      */
-    private boolean isScrollLoadMore = false;
+    private boolean mIsScrollLoadMore = false;
 
     /**
-     *
+     * footer的状态
      */
     static final int STATE_LOADING = 0;
     static final int STATE_LOAD_COMPLETE = 1;
     static final int STATE_LOAD_FAILED = 2;
     static final int STATE_NO_MORE_DATA = 3;
-    private int stateType = STATE_LOADING;
+    private int mStateType = STATE_LOADING;
 
     /**
      * 已无更多数据
      */
-    private boolean noMoreData = false;
+    private boolean mNoMoreData = false;
 
     /**
      *
      */
     private RecyclerView mRecyclerView;
-
+    /**
+     *
+     */
     private AbsLoadMoreFooter mFooter;
 
     public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
@@ -62,23 +73,23 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, AbsLoadMoreFooter footer) {
         if (adapter == null) {
-            throw new NullPointerException("adapter can not be null");
+            throw new NullPointerException("mAdapter can not be null");
         }
-        this.adapter = adapter;
+        this.mAdapter = adapter;
         this.mFooter = footer;
     }
 
     @Override
     public int getItemCount() {
-        int count = adapter.getItemCount();
+        int count = mAdapter.getItemCount();
         return count > 0 ? count + 1 : 0;
     }
 
     @Override
     public long getItemId(int position) {
-        if (position == 0) return adapter.getItemId(position);
+        if (position == 0) return mAdapter.getItemId(position);
         if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE) return VIEW_TYPE_LOAD_MORE;
-        return adapter.getItemId(position);
+        return mAdapter.getItemId(position);
     }
 
     @Override
@@ -93,14 +104,13 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        Log("onCreateViewHolder ---> " + viewType);
         if (viewType == VIEW_TYPE_LOAD_MORE) {
             final View footView = LayoutInflater.from(parent.getContext())
                     .inflate(mFooter.setLayoutRes(), parent, false);
             mFooter.onCreate(footView);
             return new LoadMoreViewHolder(footView, mFooter);
         }
-        return adapter.onCreateViewHolder(parent, viewType);
+        return mAdapter.onCreateViewHolder(parent, viewType);
     }
 
     @Override
@@ -109,18 +119,37 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
-//        Log("onBindViewHolder ----> " + holder.getClass().getSimpleName() +
-//                " ---- position == " + position);
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
         if (holder instanceof LoadMoreViewHolder) {
-            final LoadMoreViewHolder loadMoreViewHolder = (LoadMoreViewHolder) holder;
-            loadMoreViewHolder.setState(stateType);
-            if (!mRecyclerView.canScrollVertically(-1) && onLoadMoreListener != null) {
-                loadMoreViewHolder.setState(STATE_LOADING);
-                onLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
+            final LoadMoreViewHolder loadMoreVH = (LoadMoreViewHolder) holder;
+            //首次如果itemView没有填充满RecyclerView，继续加载更多
+            if (!mRecyclerView.canScrollVertically(-1) && mOnLoadMoreListener != null) {
+                //fix bug Cannot call this method while RecyclerView is computing a layout or scrolling
+                mRecyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mStateType = STATE_LOADING;
+                        mOnLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
+                    }
+                });
             }
+
+            //加载失败点击事件
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mStateType == STATE_LOAD_FAILED && mOnFailedClickListener != null) {
+                        mStateType = STATE_LOADING;
+                        mOnFailedClickListener.onClick(LoadMoreAdapter.this, holder.itemView);
+                    }
+                }
+            });
+
+            //更新状态
+            loadMoreVH.setState(mStateType);
+            Log("stateType == " + mStateType);
         } else {
-            adapter.onBindViewHolder(holder, position, payloads);
+            mAdapter.onBindViewHolder(holder, position, payloads);
         }
     }
 
@@ -128,49 +157,48 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         mRecyclerView = recyclerView;
         setFullSpan(recyclerView);
-        adapter.registerAdapterDataObserver(dataObserver);
+        mAdapter.registerAdapterDataObserver(dataObserver);
         recyclerView.addOnScrollListener(mOnScrollListener);
 
-        adapter.onAttachedToRecyclerView(recyclerView);
+        mAdapter.onAttachedToRecyclerView(recyclerView);
     }
 
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         mRecyclerView = null;
-        adapter.unregisterAdapterDataObserver(dataObserver);
+        mAdapter.unregisterAdapterDataObserver(dataObserver);
         recyclerView.removeOnScrollListener(mOnScrollListener);
 
-        adapter.onDetachedFromRecyclerView(recyclerView);
+        mAdapter.onDetachedFromRecyclerView(recyclerView);
     }
 
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof LoadMoreViewHolder) return;
-        adapter.onViewAttachedToWindow(holder);
+        mAdapter.onViewAttachedToWindow(holder);
     }
 
     @Override
     public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof LoadMoreViewHolder) return;
-        adapter.onViewDetachedFromWindow(holder);
+        mAdapter.onViewDetachedFromWindow(holder);
     }
 
     @Override
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof LoadMoreViewHolder) return;
-        adapter.onViewRecycled(holder);
+        mAdapter.onViewRecycled(holder);
     }
 
     @Override
     public boolean onFailedToRecycleView(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof LoadMoreViewHolder) return false;
-        return adapter.onFailedToRecycleView(holder);
+        return mAdapter.onFailedToRecycleView(holder);
     }
 
     private RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onChanged() {
-            Log("onChanged");
             LoadMoreAdapter.this.notifyDataSetChanged();
         }
 
@@ -204,8 +232,17 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onLoadMore(LoadMoreAdapter adapter);
     }
 
-    public LoadMoreAdapter addLoadMoreListener(OnLoadMoreListener listener) {
-        this.onLoadMoreListener = listener;
+    public interface OnFailedClickListener {
+        void onClick(LoadMoreAdapter adapter, View view);
+    }
+
+    public LoadMoreAdapter setLoadMoreListener(OnLoadMoreListener listener) {
+        this.mOnLoadMoreListener = listener;
+        return this;
+    }
+
+    public LoadMoreAdapter setOnFailedClickListener(OnFailedClickListener listener) {
+        this.mOnFailedClickListener = listener;
         return this;
     }
 
@@ -214,19 +251,19 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
 
             if (newState != RecyclerView.SCROLL_STATE_IDLE
-                    || onLoadMoreListener == null
-                    || noMoreData
-                    || !isScrollLoadMore) return;
+                    || mOnLoadMoreListener == null
+                    || mNoMoreData
+                    || !mIsScrollLoadMore) return;
 
             if (canLoadMore(recyclerView.getLayoutManager())) {
-                loading();
-                onLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
+                mStateType = STATE_LOADING;
+                mOnLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
             }
         }
 
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-            isScrollLoadMore = dy > 0;
+            mIsScrollLoadMore = dy > 0;
         }
     };
 
@@ -252,32 +289,32 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public RecyclerView.Adapter<RecyclerView.ViewHolder> getRealAdapter() {
-        return adapter;
+        return mAdapter;
     }
 
     public void loadComplete() {
-        this.stateType = STATE_LOAD_COMPLETE;
+        this.mStateType = STATE_LOAD_COMPLETE;
         notifyLoadMoreVH();
     }
 
-    private void loading() {
-        this.stateType = STATE_LOADING;
+    private void loadingMore() {
+        this.mStateType = STATE_LOADING;
         notifyLoadMoreVH();
     }
 
     public void loadFailed() {
-        this.stateType = STATE_LOAD_FAILED;
+        this.mStateType = STATE_LOAD_FAILED;
         notifyLoadMoreVH();
     }
 
     public void noMoreData() {
-        this.stateType = STATE_NO_MORE_DATA;
-        noMoreData = true;
+        this.mStateType = STATE_NO_MORE_DATA;
+        mNoMoreData = true;
         notifyLoadMoreVH();
     }
 
     public void resetNoMoreData() {
-        noMoreData = false;
+        mNoMoreData = false;
     }
 
     private void notifyLoadMoreVH() {

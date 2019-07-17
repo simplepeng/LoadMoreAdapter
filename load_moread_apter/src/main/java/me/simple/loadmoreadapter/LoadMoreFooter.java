@@ -47,5 +47,4 @@ class LoadMoreFooter extends AbsLoadMoreFooter {
         mTextView.setText("加载失败");
     }
 
-
 }

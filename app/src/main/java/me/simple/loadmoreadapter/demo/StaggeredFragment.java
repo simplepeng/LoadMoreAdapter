@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -36,7 +35,7 @@ public class StaggeredFragment extends Fragment {
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter, new CustomFooter())
-                .addLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
+                .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
                     @Override
                     public void onLoadMore(LoadMoreAdapter adapter) {
                         addData(adapter);

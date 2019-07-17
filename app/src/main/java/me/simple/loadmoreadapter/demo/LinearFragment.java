@@ -10,9 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.widget.Toast;
 
 import me.drakeet.multitype.Items;
 import me.drakeet.multitype.MultiTypeAdapter;
@@ -22,6 +20,7 @@ public class LinearFragment extends Fragment {
 
     Items mItems = new Items();
     MultiTypeAdapter mAdapter = new MultiTypeAdapter(mItems);
+    LoadMoreAdapter loadMoreAdapter;
 
     @Nullable
     @Override
@@ -37,41 +36,49 @@ public class LinearFragment extends Fragment {
 
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter, new CustomFooter())
-                .addLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
+        loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
+                .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
                     @Override
                     public void onLoadMore(LoadMoreAdapter adapter) {
-                        addData(adapter);
+                        getData();
+                    }
+                })
+                .setOnFailedClickListener(new LoadMoreAdapter.OnFailedClickListener() {
+                    @Override
+                    public void onClick(LoadMoreAdapter adapter, View view) {
+                        Toast.makeText(getContext(), "onFailedClick", Toast.LENGTH_SHORT).show();
+                        mItems.add("1");
+                        mItems.add("2");
+                        mItems.add("3");
+                        mItems.add("4");
+                        mItems.add("5");
+                        mItems.add("6");
+                        mAdapter.notifyItemRangeInserted(mItems.size() - 6, 6);
                     }
                 });
         rv.setAdapter(loadMoreAdapter);
 
-        addData(loadMoreAdapter);
+        getData();
     }
 
-    private void addData(final LoadMoreAdapter adapter) {
+    private void getData() {
+        if (mItems.size() > 10 && mItems.size() < 15) {
+            loadMoreAdapter.loadFailed();
+            return;
+        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                adapter.loadComplete();
-
-//                mItems.add("1");
-//                mItems.add("2");
-//                mItems.add("3");
-//                mItems.add("4");
-//                mItems.add("5");
                 mItems.add("Java");
-                mItems.add("Kotlin");
                 mItems.add("C++");
-                mItems.add("Go");
-                mItems.add("Ruby");
-//                mAdapter.notifyDataSetChanged();
-//                mAdapter.notifyItemInserted(0);
-                mAdapter.notifyItemRangeInserted(mItems.size() - 5, 5);
+                mItems.add("Python");
+                mItems.add("Kotlin");
+                mItems.add("Rust");
+                mItems.add("C");
+                mAdapter.notifyItemRangeInserted(mItems.size() - 6, 6);
 
-                if (mItems.size() > 20) {
-                    adapter.noMoreData();
+                if (mItems.size() >= 30) {
+                    loadMoreAdapter.noMoreData();
                 }
             }
         }, 1500);

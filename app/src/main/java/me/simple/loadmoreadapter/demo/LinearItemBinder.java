@@ -19,7 +19,7 @@ public class LinearItemBinder extends ItemViewBinder<String, LinearItemBinder.VH
 
     @Override
     protected void onBindViewHolder(@NonNull VH holder, @NonNull String item) {
-        holder.textView.setText(item);
+        holder.textView.setText(String.format("%s ----- %s", item, holder.getAdapterPosition() + 1));
     }
 
     class VH extends RecyclerView.ViewHolder {
