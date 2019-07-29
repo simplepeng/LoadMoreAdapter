@@ -36,6 +36,7 @@ public class LinearFragment extends Fragment {
 
         RecyclerView rv = view.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
                 .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
                     @Override
