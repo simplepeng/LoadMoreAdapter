@@ -27,13 +27,6 @@ class LoadMoreFooter extends AbsLoadMoreFooter {
     }
 
     @Override
-    public void loadComplete() {
-        mProgressBar.setVisibility(View.GONE);
-        mTextView.setVisibility(View.VISIBLE);
-        mTextView.setText("加载完成");
-    }
-
-    @Override
     public void noMoreData() {
         mProgressBar.setVisibility(View.GONE);
         mTextView.setVisibility(View.VISIBLE);

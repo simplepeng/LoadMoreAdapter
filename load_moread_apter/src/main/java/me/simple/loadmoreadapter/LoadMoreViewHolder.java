@@ -25,9 +25,6 @@ class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
             case LoadMoreAdapter.STATE_LOADING:
                 loading();
                 break;
-            case LoadMoreAdapter.STATE_LOAD_COMPLETE:
-                loadComplete();
-                break;
             case LoadMoreAdapter.STATE_LOAD_FAILED:
                 loadFailed();
                 break;
@@ -40,11 +37,6 @@ class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
     @Override
     public void loading() {
         mFooter.loading();
-    }
-
-    @Override
-    public void loadComplete() {
-        mFooter.loadComplete();
     }
 
     @Override

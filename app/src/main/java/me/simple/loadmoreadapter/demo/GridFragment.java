@@ -20,6 +20,8 @@ public class GridFragment extends Fragment {
     Items mItems = new Items();
     MultiTypeAdapter mAdapter = new MultiTypeAdapter(mItems);
 
+    LoadMoreAdapter loadMoreAdapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -30,47 +32,46 @@ public class GridFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter.register(String.class, new LinearItemBinder());
+        mAdapter.register(String.class, new GridItemBinder());
 
         RecyclerView rv = view.findViewById(R.id.rv);
-        rv.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
+        rv.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter, new CustomFooter())
                 .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
                     @Override
                     public void onLoadMore(LoadMoreAdapter adapter) {
-                        addData(adapter);
+                        addData();
+                    }
+                })
+                .setOnFailedClickListener(new LoadMoreAdapter.OnFailedClickListener() {
+                    @Override
+                    public void onClick(LoadMoreAdapter adapter, View view) {
+
                     }
                 });
         rv.setAdapter(loadMoreAdapter);
 
-        addData(loadMoreAdapter);
+        addData();
     }
 
-    private void addData(final LoadMoreAdapter adapter) {
+    private void addData() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
 
-                adapter.loadComplete();
 
-                mItems.add("1");
-                mItems.add("2");
-                mItems.add("3");
-                mItems.add("4");
-                mItems.add("5");
-//                mItems.add("Java");
-//                mItems.add("Kotlin");
-//                mItems.add("C++");
-//                mItems.add("Go");
-//                mItems.add("Ruby");
-//                mAdapter.notifyDataSetChanged();
-//                mAdapter.notifyItemInserted(0);
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
                 mAdapter.notifyItemRangeInserted(mItems.size() - 5, 5);
 
-                if (mItems.size() > 80) {
-                    adapter.noMoreData();
+                if (mItems.size() > 30) {
+                    loadMoreAdapter.noMoreData();
                 }
             }
-        }, 1500);
+        }, 1000);
     }
 }

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ public class StaggeredFragment extends Fragment {
 
     Items mItems = new Items();
     MultiTypeAdapter mAdapter = new MultiTypeAdapter(mItems);
+    LoadMoreAdapter loadMoreAdapter;
 
     @Nullable
     @Override
@@ -30,45 +32,47 @@ public class StaggeredFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter.register(String.class, new LinearItemBinder());
+        mAdapter.register(String.class, new GridItemBinder());
 
         RecyclerView rv = view.findViewById(R.id.rv);
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.refreshLayout);
+
         rv.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        LoadMoreAdapter loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter, new CustomFooter())
+        loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
                 .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
                     @Override
                     public void onLoadMore(LoadMoreAdapter adapter) {
-                        addData(adapter);
+                        getData();
                     }
                 });
         rv.setAdapter(loadMoreAdapter);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadMoreAdapter.resetNoMoreData();
+                mItems.clear();
+                getData();
+            }
+        });
 
-        addData(loadMoreAdapter);
+        getData();
     }
 
-    private void addData(final LoadMoreAdapter adapter) {
+    private void getData() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+//                loadMoreAdapter.loadComplete();
 
-                adapter.loadComplete();
-
-                mItems.add("1");
-                mItems.add("2");
-                mItems.add("3");
-                mItems.add("4");
-                mItems.add("5");
-                mItems.add("Java");
-                mItems.add("Kotlin");
-                mItems.add("C++");
-                mItems.add("Go");
-                mItems.add("Ruby");
-//                mAdapter.notifyDataSetChanged();
-//                mAdapter.notifyItemInserted(0);
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
+                mItems.add("");
                 mAdapter.notifyItemRangeInserted(mItems.size() - 5, 5);
 
-                if (mItems.size() > 80) {
-                    adapter.noMoreData();
+                if (mItems.size() >= 30) {
+                    loadMoreAdapter.noMoreData();
                 }
             }
         }, 1500);

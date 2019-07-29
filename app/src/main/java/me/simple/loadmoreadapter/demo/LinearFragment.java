@@ -69,6 +69,7 @@ public class LinearFragment extends Fragment {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 mItems.add("Java");
                 mItems.add("C++");
                 mItems.add("Python");

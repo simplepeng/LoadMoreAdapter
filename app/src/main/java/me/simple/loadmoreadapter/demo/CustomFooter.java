@@ -25,11 +25,6 @@ public class CustomFooter extends AbsLoadMoreFooter {
     }
 
     @Override
-    public void loadComplete() {
-        mTextView.setText("加载完成，上划加载等多");
-    }
-
-    @Override
     public void noMoreData() {
         mTextView.setText("我是有底线的");
     }

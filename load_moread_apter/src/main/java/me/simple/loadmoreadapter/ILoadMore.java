@@ -8,11 +8,6 @@ public interface ILoadMore {
     void loading();
 
     /**
-     * 加载完成
-     */
-    void loadComplete();
-
-    /**
      * 加载完成-已无更多数据
      */
     void noMoreData();

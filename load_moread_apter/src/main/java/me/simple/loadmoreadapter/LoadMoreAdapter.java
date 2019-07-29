@@ -40,7 +40,7 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * footer的状态
      */
     static final int STATE_LOADING = 0;
-    static final int STATE_LOAD_COMPLETE = 1;
+//    static final int STATE_LOAD_COMPLETE = 1;
     static final int STATE_LOAD_FAILED = 2;
     static final int STATE_NO_MORE_DATA = 3;
     private int mStateType = STATE_LOADING;
@@ -129,6 +129,7 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     @Override
                     public void run() {
                         mStateType = STATE_LOADING;
+                        loadMoreVH.setState(mStateType);
                         mOnLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
                     }
                 });
@@ -250,13 +251,13 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
 
-            if (newState != RecyclerView.SCROLL_STATE_IDLE
-                    || mOnLoadMoreListener == null
+            if (newState != RecyclerView.SCROLL_STATE_IDLE ||
+                    mOnLoadMoreListener == null
                     || mNoMoreData
                     || !mIsScrollLoadMore) return;
 
             if (canLoadMore(recyclerView.getLayoutManager())) {
-                mStateType = STATE_LOADING;
+                loadingMore();
                 mOnLoadMoreListener.onLoadMore(LoadMoreAdapter.this);
             }
         }
@@ -292,24 +293,22 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return mAdapter;
     }
 
-    public void loadComplete() {
-        this.mStateType = STATE_LOAD_COMPLETE;
-        notifyLoadMoreVH();
-    }
-
     private void loadingMore() {
-        this.mStateType = STATE_LOADING;
-        notifyLoadMoreVH();
+        setState(STATE_LOADING);
     }
 
     public void loadFailed() {
-        this.mStateType = STATE_LOAD_FAILED;
-        notifyLoadMoreVH();
+        setState(STATE_LOAD_FAILED);
     }
 
     public void noMoreData() {
-        this.mStateType = STATE_NO_MORE_DATA;
         mNoMoreData = true;
+        setState(STATE_NO_MORE_DATA);
+    }
+
+    private void setState(int state) {
+        if (mStateType == state) return;
+        this.mStateType = state;
         notifyLoadMoreVH();
     }
 
