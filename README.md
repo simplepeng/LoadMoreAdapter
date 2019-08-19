@@ -1,5 +1,17 @@
 ## LoadMoreAdapter
 
+|                     LinearLayoutManager                      | GridLayoutManager                                            | StaggeredGridLayoutManager                                   |
+| :----------------------------------------------------------: | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ![](https://raw.githubusercontent.com/simplepeng/ImageRepo/master/lm_linear.png) | ![](https://raw.githubusercontent.com/simplepeng/ImageRepo/master/lm_grid.png) | ![](https://raw.githubusercontent.com/simplepeng/ImageRepo/master/lm_staggered.png) |
+
+## 导入依赖
+
+```groovy
+
+```
+
+## 使用
+
 ```java
 loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
                 .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
