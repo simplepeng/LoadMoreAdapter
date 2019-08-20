@@ -7,7 +7,7 @@
 ## 导入依赖
 
 ```groovy
-
+implementation 'me.simple:load-more-adapter:1.0.0'
 ```
 
 ## 使用
