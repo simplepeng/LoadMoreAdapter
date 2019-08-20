@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * 底部加载更多的ViewHolder
+ */
 class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
 
     private AbsLoadMoreFooter mFooter;
