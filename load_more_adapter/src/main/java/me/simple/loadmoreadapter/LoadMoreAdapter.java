@@ -1,5 +1,6 @@
 package me.simple.loadmoreadapter;
 
+import android.database.Observable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,8 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"unchecked", "WeakerAccess", "unused"})
 public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /**
@@ -158,7 +162,11 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         mRecyclerView = recyclerView;
         setFullSpan(recyclerView);
-        mAdapter.registerAdapterDataObserver(dataObserver);
+
+        if (!isRegistered()) {
+            mAdapter.registerAdapterDataObserver(dataObserver);
+        }
+
         recyclerView.addOnScrollListener(mOnScrollListener);
 
         mAdapter.onAttachedToRecyclerView(recyclerView);
@@ -167,7 +175,11 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         mRecyclerView = null;
-        mAdapter.unregisterAdapterDataObserver(dataObserver);
+
+        if (isRegistered()) {
+            mAdapter.unregisterAdapterDataObserver(dataObserver);
+        }
+
         recyclerView.removeOnScrollListener(mOnScrollListener);
 
         mAdapter.onDetachedFromRecyclerView(recyclerView);
@@ -228,6 +240,24 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             LoadMoreAdapter.this.notifyItemRangeChanged(fromPosition, toPosition, itemCount);
         }
     };
+
+    private boolean isRegistered() {
+        boolean isRegistered = false;
+        try {
+            Class<? extends RecyclerView.Adapter> clazz = RecyclerView.Adapter.class;
+            Field field = clazz.getDeclaredField("mObservable");
+            field.setAccessible(true);
+            Observable observable = (Observable) field.get(mAdapter);
+
+            Field observersField = Observable.class.getDeclaredField("mObservers");
+            observersField.setAccessible(true);
+            ArrayList<Object> list = (ArrayList<Object>) observersField.get(observable);
+            isRegistered = list.contains(dataObserver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isRegistered;
+    }
 
     public interface OnLoadMoreListener {
         void onLoadMore(LoadMoreAdapter adapter);
