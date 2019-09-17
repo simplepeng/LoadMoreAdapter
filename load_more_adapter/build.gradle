@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
@@ -17,11 +18,26 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
 }
 
+//bintray 发布
 publish {
     userOrg = 'simplepeng' //bintray的用户名
-    groupId = 'me.simple' //分组名称
-    artifactId = 'load-more-adapter' //项目名称
-    publishVersion = '1.0.0' //版本
+    groupId = rootProject.ext.groupId //分组名称
+    artifactId = rootProject.ext.artifactId //项目名称
+    publishVersion = rootProject.ext.publishVersion //版本
     desc = '用包装器模式给RecyclerView添加可以加载更多的Adapter' //描述
     website = 'https://github.com/simplepeng/LoadMoreAdapter' //网址
+}
+
+//本地发布
+uploadArchives {
+    repositories.mavenDeployer {
+        // 本地仓库路径
+        repository(url: 'file:///Users/chenpeng/Desktop/Repositories/')
+        // 唯一标识
+        pom.groupId = rootProject.ext.groupId
+        // 项目名称
+        pom.artifactId = rootProject.ext.artifactId
+        // 版本号
+        pom.version = rootProject.ext.publishVersion
+    }
 }

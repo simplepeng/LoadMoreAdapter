@@ -32,4 +32,9 @@ ext {
     minSdkVersion = 14
     compileSdkVersion = 27
     targetSdkVersion = 27
+
+    groupId = "me.simple"
+    artifactId = 'load-more-adapter'
+    publishVersion = '1.0.1'
+
 }
