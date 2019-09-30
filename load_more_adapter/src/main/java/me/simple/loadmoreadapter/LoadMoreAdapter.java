@@ -62,13 +62,13 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      *
      */
-    private AbsLoadMoreFooter mFooter;
+    private ILoadMoreFooter mFooter;
 
     public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
         return new LoadMoreAdapter(adapter);
     }
 
-    public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, AbsLoadMoreFooter footer) {
+    public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, ILoadMoreFooter footer) {
         return new LoadMoreAdapter(adapter, footer);
     }
 
@@ -76,7 +76,7 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this(adapter, new LoadMoreFooter());
     }
 
-    private LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, AbsLoadMoreFooter footer) {
+    private LoadMoreAdapter(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter, ILoadMoreFooter footer) {
         if (adapter == null) {
             throw new NullPointerException("mAdapter can not be null");
         }
@@ -153,7 +153,6 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             //更新状态
             loadMoreVH.setState(mStateType);
-            Log("stateType == " + mStateType);
         } else {
             mAdapter.onBindViewHolder(holder, position, payloads);
         }
@@ -374,6 +373,5 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void Log(String text) {
         Log.d("LoadMoreAdapter", text);
     }
-
 
 }

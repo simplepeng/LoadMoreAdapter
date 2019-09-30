@@ -7,7 +7,7 @@ import android.widget.TextView;
 /**
  * 默认的底部加载布局
  */
-class LoadMoreFooter extends AbsLoadMoreFooter {
+class LoadMoreFooter implements ILoadMoreFooter {
 
     private ProgressBar mProgressBar;
     private TextView mTextView;
