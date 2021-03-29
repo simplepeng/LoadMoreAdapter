@@ -67,6 +67,11 @@ public class LinearFragment extends Fragment {
             loadMoreAdapter.loadFailed();
             return;
         }
+
+        if (mItems.size() >= 5) {
+            loadMoreAdapter.noMoreData();
+            return;
+        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -74,14 +79,15 @@ public class LinearFragment extends Fragment {
                 mItems.add("Java");
                 mItems.add("C++");
                 mItems.add("Python");
-                mItems.add("Kotlin");
-                mItems.add("Rust");
-                mItems.add("C");
-                mAdapter.notifyItemRangeInserted(mItems.size() - 6, 6);
+                mAdapter.notifyDataSetChanged();
+//                mItems.add("Kotlin");
+//                mItems.add("Rust");
+//                mItems.add("C");
+//                mAdapter.notifyItemRangeInserted(mItems.size() - 6, 6);
 
-                if (mItems.size() >= 30) {
-                    loadMoreAdapter.noMoreData();
-                }
+//                if (mItems.size() >= 5) {
+//                    loadMoreAdapter.noMoreData();
+//                }
             }
         }, 1500);
     }
