@@ -35,19 +35,19 @@ class LinearFragment : Fragment() {
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = LinearLayoutManager(activity)
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
-            .setOnLoadMoreListener {
-                getData()
-            }
-            .setOnFailedClickListener { adapter, view ->
-                Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
-                mItems.add("1")
-                mItems.add("2")
-                mItems.add("3")
-                mItems.add("4")
-                mItems.add("5")
-                mItems.add("6")
-                mAdapter.notifyItemRangeInserted(mItems.size - 6, 6)
-            }
+        loadMoreAdapter?.setOnLoadMoreListener {
+            getData()
+        }
+        loadMoreAdapter?.setOnFailedClickListener { adapter, view ->
+            Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
+            mItems.add("1")
+            mItems.add("2")
+            mItems.add("3")
+            mItems.add("4")
+            mItems.add("5")
+            mItems.add("6")
+            mAdapter.notifyItemRangeInserted(mItems.size - 6, 6)
+        }
         rv.adapter = loadMoreAdapter
 
         getData()

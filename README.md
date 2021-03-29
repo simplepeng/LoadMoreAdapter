@@ -1,64 +1,66 @@
 ## LoadMoreAdapter
 
+用包装器模式给RecyclerView添加可以加载更多的Adapter
+
 |                     LinearLayoutManager                      | GridLayoutManager                                            | StaggeredGridLayoutManager                                   |
 | :----------------------------------------------------------: | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![](https://raw.githubusercontent.com/simplepeng/ImageRepo/master/lm_linear.png) | ![](https://raw.githubusercontent.com/simplepeng/ImageRepo/master/lm_grid.png) | ![](https://raw.githubusercontent.com/simplepeng/ImageRepo/master/lm_staggered.png) |
 
 ## 导入依赖
 
+```css
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
 ```groovy
-implementation 'me.simple:load-more-adapter:1.0.1'
+	dependencies {
+	        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.3'
+	}
 ```
 
 ## 使用
 
-```java
+```kotlin
 loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
-                .setLoadMoreListener(new LoadMoreAdapter.OnLoadMoreListener() {
-                    @Override
-                    public void onLoadMore(LoadMoreAdapter adapter) {
-                       
-                    }
-                })
-                .setOnFailedClickListener(new LoadMoreAdapter.OnFailedClickListener() {
-                    @Override
-                    public void onClick(LoadMoreAdapter adapter, View view) {
-                        
-                    }
-});
-rv.setAdapter(loadMoreAdapter);
+loadMoreAdapter?.setOnLoadMoreListener {
+    loadMoreData()
+}
+loadMoreAdapter?.setOnFailedClickListener { adapter, view ->
+                                           
+}
+rv.adapter = loadMoreAdapter
 ```
 
 ## 自定义底部
 
-```java
-public class CustomFooter extends AbsLoadMoreFooter {
+```kotlin
+class CustomFooter : ILoadMoreFooter {
 
-    private TextView mTextView;
+    private var mTextView: TextView? = null
 
-    @Override
-    public int setLayoutRes() {
-        return R.layout.footer_custom;
+    override fun setLayoutRes(): Int {
+        return R.layout.footer_custom
     }
 
-    @Override
-    public void onCreate(View footerView) {
-        mTextView = footerView.findViewById(R.id.tv_custom);
+    override fun onCreate(footerView: View) {
+        mTextView = footerView.findViewById(R.id.tv_custom)
     }
 
-    @Override
-    public void loading() {
-        mTextView.setText("加载更多中...");
+    override fun loading() {
+        mTextView!!.text = "加载更多中..."
     }
 
-    @Override
-    public void noMoreData() {
-        mTextView.setText("我是有底线的");
+    override fun noMoreData() {
+        mTextView!!.text = "我是有底线的"
     }
 
-    @Override
-    public void loadFailed() {
-        mTextView.setText("服务器开了小差");
+    override fun loadFailed() {
+        mTextView!!.text = "服务器开了小差"
     }
 }
 ```
@@ -72,9 +74,15 @@ rv.setAdapter(loadMoreAdapter);
 
 ```java
 //加载失败
-loadMoreAdapter.loadFailed();
+loadMoreAdapter.loadMoreFailed();
 //已无更多数据
 loadMoreAdapter.noMoreData();
 //重置状态
 loadMoreAdapter.resetNoMoreData();
 ```
+
+## 版本迭代
+
+* v1.0.3：升级`AndroidX`，`Kotlin`，修复bug
+* v1.0.2：迁移到`jitpack`
+* v1.0.0：首次上传
