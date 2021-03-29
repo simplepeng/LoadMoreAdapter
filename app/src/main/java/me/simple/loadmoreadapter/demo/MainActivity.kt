@@ -1,66 +1,50 @@
-package me.simple.loadmoreadapter.demo;
+package me.simple.loadmoreadapter.demo
 
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 
-public class MainActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        final TabLayout tabLayout = findViewById(R.id.tabLayout);
-        ViewPager viewPager = findViewById(R.id.viewPager);
-
-        TabLayout.Tab tab1 = tabLayout.newTab();
-        tab1.setText("Linear");
-        TabLayout.Tab tab2 = tabLayout.newTab();
-        tab2.setText("Grid");
-        TabLayout.Tab tab3 = tabLayout.newTab();
-        tab3.setText("Sta");
-        tabLayout.addTab(tab1);
-        tabLayout.addTab(tab2);
-        tabLayout.addTab(tab3);
-        tabLayout.setupWithViewPager(viewPager);
-
-        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
-            @Override
-            public Fragment getItem(int i) {
-                switch (i) {
-                    case 0:
-                        return new LinearFragment();
-                    case 1:
-                        return new GridFragment();
-                    case 2:
-                        return new StaggeredFragment();
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
+        val viewPager = findViewById<ViewPager>(R.id.viewPager)
+        val tab1 = tabLayout.newTab()
+        tab1.text = "Linear"
+        val tab2 = tabLayout.newTab()
+        tab2.text = "Grid"
+        val tab3 = tabLayout.newTab()
+        tab3.text = "Sta"
+        tabLayout.addTab(tab1)
+        tabLayout.addTab(tab2)
+        tabLayout.addTab(tab3)
+        tabLayout.setupWithViewPager(viewPager)
+        viewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
+            override fun getItem(i: Int): Fragment {
+                when (i) {
+                    0 -> return LinearFragment()
+                    1 -> return GridFragment()
+                    2 -> return StaggeredFragment()
                 }
-                return new LinearFragment();
+                return LinearFragment()
             }
 
-            @Nullable
-            @Override
-            public CharSequence getPageTitle(int position) {
-                switch (position) {
-                    case 0:
-                        return "Linear";
-                    case 1:
-                        return "Grid";
-                    case 2:
-                        return "Sta";
+            override fun getPageTitle(position: Int): CharSequence? {
+                when (position) {
+                    0 -> return "Linear"
+                    1 -> return "Grid"
+                    2 -> return "Sta"
                 }
-                return "";
+                return ""
             }
 
-            @Override
-            public int getCount() {
-                return 3;
+            override fun getCount(): Int {
+                return 3
             }
-        });
+        }
     }
 }

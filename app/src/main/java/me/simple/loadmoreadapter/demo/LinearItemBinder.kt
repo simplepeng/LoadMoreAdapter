@@ -1,34 +1,26 @@
-package me.simple.loadmoreadapter.demo;
+package me.simple.loadmoreadapter.demo
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import me.drakeet.multitype.ItemViewBinder
 
-import me.drakeet.multitype.ItemViewBinder;
-
-public class LinearItemBinder extends ItemViewBinder<String, LinearItemBinder.VH> {
-
-    @NonNull
-    @Override
-    protected VH onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
-        return new VH(inflater.inflate(R.layout.item_linear, parent, false));
+class LinearItemBinder : ItemViewBinder<String, LinearItemBinder.VH>() {
+    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): VH {
+        return VH(inflater.inflate(R.layout.item_linear, parent, false))
     }
 
-    @Override
-    protected void onBindViewHolder(@NonNull VH holder, @NonNull String item) {
-        holder.textView.setText(String.format("%s ----- %s", item, holder.getAdapterPosition() + 1));
+    override fun onBindViewHolder(holder: VH, item: String) {
+        holder.textView.text = String.format("%s ----- %s", item, holder.adapterPosition + 1)
     }
 
-    class VH extends RecyclerView.ViewHolder {
+    inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var textView: TextView
 
-        TextView textView;
-
-        public VH(@NonNull View itemView) {
-            super(itemView);
-            textView = itemView.findViewById(R.id.tv_linear);
+        init {
+            textView = itemView.findViewById(R.id.tv_linear)
         }
     }
 }

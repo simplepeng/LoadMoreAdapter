@@ -1,19 +1,18 @@
-package me.simple.loadmoreadapter;
+package me.simple.loadmoreadapter
 
-interface ILoadMore {
-
+internal interface ILoadMore {
     /**
      * 加载更多中
      */
-    void loading();
+    fun loading()
 
     /**
      * 加载完成-已无更多数据
      */
-    void noMoreData();
+    fun noMoreData()
 
     /**
      * 加载失败
      */
-    void loadFailed();
+    fun loadFailed()
 }

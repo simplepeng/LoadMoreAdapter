@@ -1,38 +1,33 @@
-package me.simple.loadmoreadapter;
+package me.simple.loadmoreadapter
 
-import android.view.View;
+import android.view.View
 
-public interface ILoadMoreFooter {
-
+interface ILoadMoreFooter {
     /**
      * 设置footer的布局
      */
-    int setLayoutRes();
+    fun setLayoutRes(): Int
 
     /**
      * footer布局初始化完成
      */
-    void onCreate(View footerView);
+    fun onCreate(footerView: View)
 
     /**
      * 加载更多中
      */
-    void loading();
-
-//    /**
-//     * 加载完成
-//     */
-//    public abstract void loadComplete();
-
+    fun loading()
+    //    /**
+    //     * 加载完成
+    //     */
+    //    public abstract void loadComplete();
     /**
      * 加载完成-已无更多数据
      */
-    void noMoreData();
+    fun noMoreData()
 
     /**
      * 加载失败
      */
-    void loadFailed();
-
-
+    fun loadFailed()
 }

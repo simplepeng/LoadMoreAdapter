@@ -1,46 +1,38 @@
-package me.simple.loadmoreadapter;
+package me.simple.loadmoreadapter
 
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
 
 /**
  * 默认的底部加载布局
  */
-class LoadMoreFooter implements ILoadMoreFooter {
-
-    private ProgressBar mProgressBar;
-    private TextView mTextView;
-
-    @Override
-    public int setLayoutRes() {
-        return R.layout.adapter_load_more;
+internal class LoadMoreFooter : ILoadMoreFooter {
+    private var mProgressBar: ProgressBar? = null
+    private var mTextView: TextView? = null
+    override fun setLayoutRes(): Int {
+        return R.layout.adapter_load_more
     }
 
-    @Override
-    public void onCreate(View footerView) {
-        mProgressBar = footerView.findViewById(R.id.load_more_pb);
-        mTextView = footerView.findViewById(R.id.load_more_tv);
+    override fun onCreate(footerView: View) {
+        mProgressBar = footerView.findViewById(R.id.load_more_pb)
+        mTextView = footerView.findViewById(R.id.load_more_tv)
     }
 
-    @Override
-    public void loading() {
-        mProgressBar.setVisibility(View.VISIBLE);
-        mTextView.setVisibility(View.GONE);
+    override fun loading() {
+        mProgressBar!!.visibility = View.VISIBLE
+        mTextView!!.visibility = View.GONE
     }
 
-    @Override
-    public void noMoreData() {
-        mProgressBar.setVisibility(View.GONE);
-        mTextView.setVisibility(View.VISIBLE);
-        mTextView.setText("已无更多数据");
+    override fun noMoreData() {
+        mProgressBar!!.visibility = View.GONE
+        mTextView!!.visibility = View.VISIBLE
+        mTextView!!.text = "已无更多数据"
     }
 
-    @Override
-    public void loadFailed() {
-        mProgressBar.setVisibility(View.GONE);
-        mTextView.setVisibility(View.VISIBLE);
-        mTextView.setText("加载失败");
+    override fun loadFailed() {
+        mProgressBar!!.visibility = View.GONE
+        mTextView!!.visibility = View.VISIBLE
+        mTextView!!.text = "加载失败"
     }
-
 }

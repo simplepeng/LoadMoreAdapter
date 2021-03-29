@@ -1,52 +1,40 @@
-package me.simple.loadmoreadapter;
+package me.simple.loadmoreadapter
 
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import me.simple.loadmoreadapter.LoadMoreAdapter
 
 /**
  * 底部加载更多的ViewHolder
  */
-class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
-
-    private final ILoadMoreFooter mFooter;
-
-    LoadMoreViewHolder(View itemView, ILoadMoreFooter mFooter) {
-        super(itemView);
-        ViewGroup.LayoutParams params = itemView.getLayoutParams();
-        if (params instanceof StaggeredGridLayoutManager.LayoutParams) {
-            ((StaggeredGridLayoutManager.LayoutParams) params).setFullSpan(true);
-        }
-        this.mFooter = mFooter;
-    }
-
-    void setState(int stateType) {
-        switch (stateType) {
-            case LoadMoreAdapter.STATE_LOADING:
-                loading();
-                break;
-            case LoadMoreAdapter.STATE_LOAD_FAILED:
-                loadFailed();
-                break;
-            case LoadMoreAdapter.STATE_NO_MORE_DATA:
-                noMoreData();
-                break;
+internal class LoadMoreViewHolder(itemView: View, mFooter: ILoadMoreFooter) : RecyclerView.ViewHolder(itemView), ILoadMore {
+    private val mFooter: ILoadMoreFooter
+    fun setState(stateType: Int) {
+        when (stateType) {
+            LoadMoreAdapter.Companion.STATE_LOADING -> loading()
+            LoadMoreAdapter.Companion.STATE_LOAD_FAILED -> loadFailed()
+            LoadMoreAdapter.Companion.STATE_NO_MORE_DATA -> noMoreData()
         }
     }
 
-    @Override
-    public void loading() {
-        mFooter.loading();
+    override fun loading() {
+        mFooter.loading()
     }
 
-    @Override
-    public void noMoreData() {
-        mFooter.noMoreData();
+    override fun noMoreData() {
+        mFooter.noMoreData()
     }
 
-    @Override
-    public void loadFailed() {
-        mFooter.loadFailed();
+    override fun loadFailed() {
+        mFooter.loadFailed()
+    }
+
+    init {
+        val params = itemView.layoutParams
+        if (params is StaggeredGridLayoutManager.LayoutParams) {
+            params.isFullSpan = true
+        }
+        this.mFooter = mFooter
     }
 }
