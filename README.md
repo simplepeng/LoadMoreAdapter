@@ -8,19 +8,19 @@
 
 ## 导入依赖
 
-```css
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+```groovy
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
+}
 ```
 
 ```groovy
-	dependencies {
-	        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.3'
-	}
+dependencies {
+        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.3'
+}
 ```
 
 ## 使用
