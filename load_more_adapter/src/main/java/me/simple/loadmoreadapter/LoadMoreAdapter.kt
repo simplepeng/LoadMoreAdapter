@@ -12,26 +12,43 @@ import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import java.util.*
 
-class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>?, footer: ILoadMoreFooter = LoadMoreFooter()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    /**
-     *
-     */
-    val realAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
+class LoadMoreAdapter private constructor(
+    private val realAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
+    private val footer: ILoadMoreFooter = LoadMoreFooter()
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+
+        /**
+         * LoadMore的ViewType
+         */
+        private const val VIEW_TYPE_LOAD_MORE = 1112
+
+        /**
+         * footer的状态
+         */
+        const val STATE_LOADING = 0
+        const val STATE_LOAD_FAILED = 2
+        const val STATE_NO_MORE_DATA = 3
+
+        @JvmStatic
+        fun wrap(
+            adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
+            footer: ILoadMoreFooter = LoadMoreFooter()
+        ): LoadMoreAdapter {
+            return LoadMoreAdapter(adapter, footer)
+        }
+    }
 
     /**
      *
      */
-    private val VIEW_TYPE_LOAD_MORE = 1112
+    private var mOnLoadMoreListener: ((adapter: LoadMoreAdapter) -> Unit)? = null
 
     /**
      *
      */
-    private var mOnLoadMoreListener: OnLoadMoreListener? = null
-
-    /**
-     *
-     */
-    private var mOnFailedClickListener: OnFailedClickListener? = null
+    private var mOnFailedClickListener: ((adapter: LoadMoreAdapter, view: View) -> Unit)? = null
 
     /**
      * 是否为上拉
@@ -45,57 +62,89 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
     private var mNoMoreData = false
 
     /**
-     *
+     * attached的RecyclerView
      */
     private var mRecyclerView: RecyclerView? = null
 
     /**
      *
      */
-    private val mFooter: ILoadMoreFooter
     override fun getItemCount(): Int {
         val count = realAdapter.itemCount
-        return if (count > 0) count + 1 else 0
+        return if (count > 0) (count + 1) else 0
     }
 
+    /**
+     *
+     */
     override fun getItemId(position: Int): Long {
         if (position == 0) return realAdapter.getItemId(position)
-        return if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE) VIEW_TYPE_LOAD_MORE.toLong() else realAdapter.getItemId(position)
+
+        return if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE) {
+            VIEW_TYPE_LOAD_MORE.toLong()
+        } else {
+            realAdapter.getItemId(position)
+        }
     }
 
+    /**
+     *
+     */
     override fun getItemViewType(position: Int): Int {
         if (position <= 0) return super.getItemViewType(position)
+
         return if (position == itemCount - 1) {
             VIEW_TYPE_LOAD_MORE
         } else realAdapter.getItemViewType(position)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    /**
+     *
+     */
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RecyclerView.ViewHolder {
+        //如果viewType是loadMore
         if (viewType == VIEW_TYPE_LOAD_MORE) {
             val footView = LayoutInflater.from(parent.context)
-                    .inflate(mFooter.setLayoutRes(), parent, false)
-            mFooter.onCreate(footView)
-            return LoadMoreViewHolder(footView, mFooter)
+                .inflate(footer.setLayoutRes(), parent, false)
+            footer.onCreate(footView)
+            return LoadMoreViewHolder(footView, footer)
         }
+
         return realAdapter.onCreateViewHolder(parent, viewType)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    /**
+     *
+     */
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int
+    ) {
         onBindViewHolder(holder, position, emptyList())
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any>) {
+    /**
+     *
+     */
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>
+    ) {
         if (holder is LoadMoreViewHolder) {
-            val loadMoreVH = holder
-
             //首次如果itemView没有填充满RecyclerView，继续加载更多
             if (!mRecyclerView!!.canScrollVertically(-1)
-                    && mOnLoadMoreListener != null && !mNoMoreData) {
+                && mOnLoadMoreListener != null
+                && !mNoMoreData
+            ) {
                 //fix bug Cannot call this method while RecyclerView is computing a layout or scrolling
-                mRecyclerView!!.post {
+                mRecyclerView?.post {
                     mStateType = STATE_LOADING
-                    loadMoreVH.setState(mStateType)
-                    mOnLoadMoreListener!!.onLoadMore(this@LoadMoreAdapter)
+                    holder.setState(mStateType)
+                    mOnLoadMoreListener?.invoke(this@LoadMoreAdapter)
                 }
             }
 
@@ -103,19 +152,22 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
             holder.itemView.setOnClickListener {
                 if (mStateType == STATE_LOAD_FAILED && mOnFailedClickListener != null) {
                     mStateType = STATE_LOADING
-                    mOnFailedClickListener!!.onClick(this@LoadMoreAdapter, holder.itemView)
+                    mOnFailedClickListener?.invoke(this@LoadMoreAdapter, holder.itemView)
                 }
             }
 
             //更新状态
-            loadMoreVH.setState(mStateType)
+            holder.setState(mStateType)
         } else {
             realAdapter.onBindViewHolder(holder, position, payloads)
         }
     }
 
+    /**
+     *
+     */
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        mRecyclerView = recyclerView
+        this.mRecyclerView = recyclerView
         setFullSpan(recyclerView)
         if (!isRegistered) {
             realAdapter.registerAdapterDataObserver(dataObserver)
@@ -124,6 +176,9 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
         realAdapter.onAttachedToRecyclerView(recyclerView)
     }
 
+    /**
+     *
+     */
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         mRecyclerView = null
         if (isRegistered) {
@@ -133,25 +188,42 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
         realAdapter.onDetachedFromRecyclerView(recyclerView)
     }
 
+    /**
+     *
+     */
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
         realAdapter.onViewAttachedToWindow(holder)
     }
 
+    /**
+     *
+     */
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
         realAdapter.onViewDetachedFromWindow(holder)
     }
 
+    /**
+     *
+     */
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
         realAdapter.onViewRecycled(holder)
     }
 
+    /**
+     *
+     */
     override fun onFailedToRecycleView(holder: RecyclerView.ViewHolder): Boolean {
-        return if (holder is LoadMoreViewHolder) false else realAdapter.onFailedToRecycleView(holder)
+        return if (holder is LoadMoreViewHolder) false else realAdapter.onFailedToRecycleView(
+            holder
+        )
     }
 
+    /**
+     *
+     */
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
         override fun onChanged() {
             notifyDataSetChanged()
@@ -177,6 +249,10 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
             this@LoadMoreAdapter.notifyItemRangeChanged(fromPosition, toPosition, itemCount)
         }
     }
+
+    /**
+     *
+     */
     private val isRegistered: Boolean
         private get() {
             var isRegistered = false
@@ -195,31 +271,33 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
             return isRegistered
         }
 
-    interface OnLoadMoreListener {
-        fun onLoadMore(adapter: LoadMoreAdapter?)
-    }
-
-    interface OnFailedClickListener {
-        fun onClick(adapter: LoadMoreAdapter?, view: View?)
-    }
-
-    fun setLoadMoreListener(listener: OnLoadMoreListener?): LoadMoreAdapter {
-        mOnLoadMoreListener = listener
+    /**
+     * 加载更多的监听
+     */
+    fun setOnLoadMoreListener(listener: ((adapter: LoadMoreAdapter) -> Unit)? = null): LoadMoreAdapter {
+        this.mOnLoadMoreListener = listener
         return this
     }
 
-    fun setOnFailedClickListener(listener: OnFailedClickListener?): LoadMoreAdapter {
+    /**
+     * 加载失败的监听
+     */
+    fun setOnFailedClickListener(listener: ((adapter: LoadMoreAdapter, view: View) -> Unit)? = null): LoadMoreAdapter {
         mOnFailedClickListener = listener
         return this
     }
 
-    private val mOnScrollListener: RecyclerView.OnScrollListener = object : RecyclerView.OnScrollListener() {
+    /**
+     *
+     */
+    private val mOnScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             if (newState != RecyclerView.SCROLL_STATE_IDLE || mOnLoadMoreListener == null || mNoMoreData
-                    || !mIsScrollLoadMore) return
+                || !mIsScrollLoadMore
+            ) return
             if (canLoadMore(recyclerView.layoutManager)) {
                 loadingMore()
-                mOnLoadMoreListener!!.onLoadMore(this@LoadMoreAdapter)
+                mOnLoadMoreListener?.invoke(this@LoadMoreAdapter)
             }
         }
 
@@ -228,12 +306,17 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
         }
     }
 
+    /**
+     * 是否可以加载更多
+     */
     private fun canLoadMore(layoutManager: RecyclerView.LayoutManager?): Boolean {
         var canLoadMore = false
         if (layoutManager is GridLayoutManager) {
-            canLoadMore = layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1
+            canLoadMore =
+                layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1
         } else if (layoutManager is LinearLayoutManager) {
-            canLoadMore = layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1
+            canLoadMore =
+                layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1
         } else if (layoutManager is StaggeredGridLayoutManager) {
             val sgLayoutManager = layoutManager
             val into = IntArray(sgLayoutManager.spanCount)
@@ -249,77 +332,67 @@ class LoadMoreAdapter private constructor(adapter: RecyclerView.Adapter<Recycler
         return canLoadMore
     }
 
+    /**
+     *
+     */
     private fun loadingMore() {
         setState(STATE_LOADING)
     }
 
-    fun loadFailed() {
+    /**
+     * 加载更多失败
+     */
+    fun loadMoreFailed() {
         setState(STATE_LOAD_FAILED)
     }
 
+    /**
+     * 没有更多数据了
+     */
     fun noMoreData() {
         mNoMoreData = true
         setState(STATE_NO_MORE_DATA)
     }
 
+    /**
+     * 重置状态
+     */
+    fun resetNoMoreData() {
+        mNoMoreData = false
+    }
+
+    /**
+     *
+     */
     private fun setState(state: Int) {
         if (mStateType == state) return
         mStateType = state
         notifyLoadMoreVH()
     }
 
-    fun resetNoMoreData() {
-        mNoMoreData = false
-    }
-
+    /**
+     *
+     */
     private fun notifyLoadMoreVH() {
         if (itemCount <= 0) return
         this@LoadMoreAdapter.notifyItemChanged(itemCount - 1)
     }
 
+    /**
+     * 设置加载更多的item能填充满一横格
+     */
     private fun setFullSpan(recyclerView: RecyclerView) {
         val layoutManager = recyclerView.layoutManager ?: return
+
         if (layoutManager is GridLayoutManager) {
-            val gm = layoutManager
-            gm.spanSizeLookup = object : SpanSizeLookup() {
+            layoutManager.spanSizeLookup = object : SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     val viewType = getItemViewType(position)
-                    return if (viewType == VIEW_TYPE_LOAD_MORE) gm.spanCount else 1
+                    return if (viewType == VIEW_TYPE_LOAD_MORE) layoutManager.spanCount else 1
                 }
             }
-        } else if (layoutManager is StaggeredGridLayoutManager) {
-            val sgm = layoutManager
         }
     }
 
-    private fun Log(text: String) {
-        android.util.Log.d("LoadMoreAdapter", text)
-    }
 
-    companion object {
-        /**
-         * footer的状态
-         */
-        const val STATE_LOADING = 0
-
-        //    static final int STATE_LOAD_COMPLETE = 1;
-        const val STATE_LOAD_FAILED = 2
-        const val STATE_NO_MORE_DATA = 3
-        fun wrap(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>?): LoadMoreAdapter {
-            return LoadMoreAdapter(adapter)
-        }
-
-        @JvmStatic
-        fun wrap(adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>?, footer: ILoadMoreFooter): LoadMoreAdapter {
-            return LoadMoreAdapter(adapter, footer)
-        }
-    }
-
-    init {
-        if (adapter == null) {
-            throw NullPointerException("mAdapter can not be null")
-        }
-        realAdapter = adapter
-        mFooter = footer
-    }
 }

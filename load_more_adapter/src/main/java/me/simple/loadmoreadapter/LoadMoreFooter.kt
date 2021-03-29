@@ -8,8 +8,10 @@ import android.widget.TextView
  * 默认的底部加载布局
  */
 internal class LoadMoreFooter : ILoadMoreFooter {
+
     private var mProgressBar: ProgressBar? = null
     private var mTextView: TextView? = null
+
     override fun setLayoutRes(): Int {
         return R.layout.adapter_load_more
     }

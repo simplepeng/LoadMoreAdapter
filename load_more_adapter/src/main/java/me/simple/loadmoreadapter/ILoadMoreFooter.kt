@@ -17,10 +17,7 @@ interface ILoadMoreFooter {
      * 加载更多中
      */
     fun loading()
-    //    /**
-    //     * 加载完成
-    //     */
-    //    public abstract void loadComplete();
+
     /**
      * 加载完成-已无更多数据
      */

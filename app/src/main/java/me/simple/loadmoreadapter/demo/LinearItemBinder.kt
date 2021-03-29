@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.drakeet.multitype.ItemViewBinder
 
 class LinearItemBinder : ItemViewBinder<String, LinearItemBinder.VH>() {
+
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): VH {
         return VH(inflater.inflate(R.layout.item_linear, parent, false))
     }
@@ -17,10 +18,6 @@ class LinearItemBinder : ItemViewBinder<String, LinearItemBinder.VH>() {
     }
 
     inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textView: TextView
-
-        init {
-            textView = itemView.findViewById(R.id.tv_linear)
-        }
+        var textView: TextView = itemView.findViewById(R.id.tv_linear)
     }
 }

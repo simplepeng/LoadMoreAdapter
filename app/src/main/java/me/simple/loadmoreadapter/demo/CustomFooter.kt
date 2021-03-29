@@ -5,7 +5,9 @@ import android.widget.TextView
 import me.simple.loadmoreadapter.ILoadMoreFooter
 
 class CustomFooter : ILoadMoreFooter {
+
     private var mTextView: TextView? = null
+
     override fun setLayoutRes(): Int {
         return R.layout.footer_custom
     }

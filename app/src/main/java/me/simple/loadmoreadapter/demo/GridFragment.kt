@@ -11,32 +11,32 @@ import androidx.recyclerview.widget.RecyclerView
 import me.drakeet.multitype.Items
 import me.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
-import me.simple.loadmoreadapter.LoadMoreAdapter.Companion.wrap
-import me.simple.loadmoreadapter.LoadMoreAdapter.OnFailedClickListener
-import me.simple.loadmoreadapter.LoadMoreAdapter.OnLoadMoreListener
 
 class GridFragment : Fragment() {
+
     var mItems = Items()
     var mAdapter = MultiTypeAdapter(mItems)
     var loadMoreAdapter: LoadMoreAdapter? = null
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_rv, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         mAdapter.register(String::class.java, GridItemBinder())
+
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = GridLayoutManager(activity, 3)
-        loadMoreAdapter = wrap(mAdapter, CustomFooter())
-                .setLoadMoreListener(object : OnLoadMoreListener {
-                    override fun onLoadMore(adapter: LoadMoreAdapter?) {
-                        addData()
-                    }
-                })
-                .setOnFailedClickListener(object : OnFailedClickListener {
-                    override fun onClick(adapter: LoadMoreAdapter?, view: View?) {}
-                })
+        loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter, CustomFooter())
+            .setOnLoadMoreListener {
+                addData()
+            }
         rv.adapter = loadMoreAdapter
         addData()
     }

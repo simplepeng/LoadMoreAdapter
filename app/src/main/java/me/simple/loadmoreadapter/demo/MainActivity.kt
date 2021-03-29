@@ -8,11 +8,14 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
         val viewPager = findViewById<ViewPager>(R.id.viewPager)
+
         val tab1 = tabLayout.newTab()
         tab1.text = "Linear"
         val tab2 = tabLayout.newTab()
@@ -23,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         tabLayout.addTab(tab2)
         tabLayout.addTab(tab3)
         tabLayout.setupWithViewPager(viewPager)
+
         viewPager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
             override fun getItem(i: Int): Fragment {
                 when (i) {
