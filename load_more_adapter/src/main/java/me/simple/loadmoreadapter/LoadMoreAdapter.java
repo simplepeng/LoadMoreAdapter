@@ -1,12 +1,14 @@
 package me.simple.loadmoreadapter;
 
 import android.database.Observable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +25,11 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      *
      */
-    private RecyclerView.Adapter<RecyclerView.ViewHolder> mAdapter;
+    private final RecyclerView.Adapter<RecyclerView.ViewHolder> mAdapter;
     /**
      *
      */
-    private int VIEW_TYPE_LOAD_MORE = 1112;
+    private final int VIEW_TYPE_LOAD_MORE = 1112;
     /**
      *
      */
@@ -62,7 +64,7 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     /**
      *
      */
-    private ILoadMoreFooter mFooter;
+    private final ILoadMoreFooter mFooter;
 
     public static LoadMoreAdapter wrap(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
         return new LoadMoreAdapter(adapter);
@@ -127,8 +129,11 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
         if (holder instanceof LoadMoreViewHolder) {
             final LoadMoreViewHolder loadMoreVH = (LoadMoreViewHolder) holder;
+
             //首次如果itemView没有填充满RecyclerView，继续加载更多
-            if (!mRecyclerView.canScrollVertically(-1) && mOnLoadMoreListener != null) {
+            if (!mRecyclerView.canScrollVertically(-1)
+                    && mOnLoadMoreListener != null
+                    && !mNoMoreData) {
                 //fix bug Cannot call this method while RecyclerView is computing a layout or scrolling
                 mRecyclerView.post(new Runnable() {
                     @Override
@@ -332,7 +337,7 @@ public class LoadMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     public void noMoreData() {
-        mNoMoreData = true;
+        this.mNoMoreData = true;
         setState(STATE_NO_MORE_DATA);
     }
 

@@ -1,6 +1,6 @@
 package me.simple.loadmoreadapter;
 
-public interface ILoadMore {
+interface ILoadMore {
 
     /**
      * 加载更多中

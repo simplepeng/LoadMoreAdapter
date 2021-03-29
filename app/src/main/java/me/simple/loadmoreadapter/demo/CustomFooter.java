@@ -3,9 +3,10 @@ package me.simple.loadmoreadapter.demo;
 import android.view.View;
 import android.widget.TextView;
 
-import me.simple.loadmoreadapter.AbsLoadMoreFooter;
+import me.simple.loadmoreadapter.ILoadMoreFooter;
 
-public class CustomFooter extends AbsLoadMoreFooter {
+
+public class CustomFooter implements ILoadMoreFooter {
 
     private TextView mTextView;
 

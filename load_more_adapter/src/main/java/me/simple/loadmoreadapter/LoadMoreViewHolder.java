@@ -10,7 +10,7 @@ import android.view.ViewGroup;
  */
 class LoadMoreViewHolder extends RecyclerView.ViewHolder implements ILoadMore {
 
-    private ILoadMoreFooter mFooter;
+    private final ILoadMoreFooter mFooter;
 
     LoadMoreViewHolder(View itemView, ILoadMoreFooter mFooter) {
         super(itemView);
