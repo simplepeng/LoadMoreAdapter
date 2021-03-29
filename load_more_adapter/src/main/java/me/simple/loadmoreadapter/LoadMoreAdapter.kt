@@ -1,6 +1,5 @@
 package me.simple.loadmoreadapter
 
-import android.database.Observable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,6 +53,10 @@ class LoadMoreAdapter private constructor(
      * 是否为上拉
      */
     private var mIsScrollLoadMore = false
+
+    /**
+     * 状态
+     */
     private var mStateType = STATE_LOADING
 
     /**
@@ -169,9 +172,7 @@ class LoadMoreAdapter private constructor(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         this.mRecyclerView = recyclerView
         setFullSpan(recyclerView)
-        if (!isRegistered) {
-            realAdapter.registerAdapterDataObserver(dataObserver)
-        }
+        realAdapter.registerAdapterDataObserver(mProxyDataObserver)
         recyclerView.addOnScrollListener(mOnScrollListener)
         realAdapter.onAttachedToRecyclerView(recyclerView)
     }
@@ -180,10 +181,8 @@ class LoadMoreAdapter private constructor(
      *
      */
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        mRecyclerView = null
-        if (isRegistered) {
-            realAdapter.unregisterAdapterDataObserver(dataObserver)
-        }
+        this.mRecyclerView = null
+        realAdapter.unregisterAdapterDataObserver(mProxyDataObserver)
         recyclerView.removeOnScrollListener(mOnScrollListener)
         realAdapter.onDetachedFromRecyclerView(recyclerView)
     }
@@ -222,9 +221,9 @@ class LoadMoreAdapter private constructor(
     }
 
     /**
-     *
+     * 代理原来的AdapterDataObserver
      */
-    private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
+    private val mProxyDataObserver = object : AdapterDataObserver() {
         override fun onChanged() {
             notifyDataSetChanged()
         }
@@ -251,27 +250,6 @@ class LoadMoreAdapter private constructor(
     }
 
     /**
-     *
-     */
-    private val isRegistered: Boolean
-        private get() {
-            var isRegistered = false
-            try {
-                val clazz: Class<out RecyclerView.Adapter<*>?> = RecyclerView.Adapter::class.java
-                val field = clazz.getDeclaredField("mObservable")
-                field.isAccessible = true
-                val observable = field[realAdapter] as Observable<*>
-                val observersField = Observable::class.java.getDeclaredField("mObservers")
-                observersField.isAccessible = true
-                val list = observersField[observable] as ArrayList<Any>
-                isRegistered = list.contains(dataObserver)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return isRegistered
-        }
-
-    /**
      * 加载更多的监听
      */
     fun setOnLoadMoreListener(listener: ((adapter: LoadMoreAdapter) -> Unit)? = null): LoadMoreAdapter {
@@ -288,13 +266,17 @@ class LoadMoreAdapter private constructor(
     }
 
     /**
-     *
+     * 滚动监听
      */
     private val mOnScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            if (newState != RecyclerView.SCROLL_STATE_IDLE || mOnLoadMoreListener == null || mNoMoreData
+            //判断是否能加载更多
+            if (newState != RecyclerView.SCROLL_STATE_IDLE
+                || mOnLoadMoreListener == null
+                || mNoMoreData
                 || !mIsScrollLoadMore
             ) return
+
             if (canLoadMore(recyclerView.layoutManager)) {
                 loadingMore()
                 mOnLoadMoreListener?.invoke(this@LoadMoreAdapter)
@@ -310,26 +292,23 @@ class LoadMoreAdapter private constructor(
      * 是否可以加载更多
      */
     private fun canLoadMore(layoutManager: RecyclerView.LayoutManager?): Boolean {
-        var canLoadMore = false
-        if (layoutManager is GridLayoutManager) {
-            canLoadMore =
+        return when (layoutManager) {
+            is LinearLayoutManager -> {
                 layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1
-        } else if (layoutManager is LinearLayoutManager) {
-            canLoadMore =
-                layoutManager.findLastVisibleItemPosition() >= layoutManager.getItemCount() - 1
-        } else if (layoutManager is StaggeredGridLayoutManager) {
-            val sgLayoutManager = layoutManager
-            val into = IntArray(sgLayoutManager.spanCount)
-            val lastVisibleItemPositions = sgLayoutManager.findLastVisibleItemPositions(into)
-            var lastPosition = lastVisibleItemPositions[0]
-            for (value in into) {
-                if (value > lastPosition) {
-                    lastPosition = value
-                }
             }
-            canLoadMore = lastPosition >= layoutManager.getItemCount() - 1
+            is StaggeredGridLayoutManager -> {
+                val into = IntArray(layoutManager.spanCount)
+                val lastVisibleItemPositions = layoutManager.findLastVisibleItemPositions(into)
+                var lastPosition = lastVisibleItemPositions[0]
+                for (value in into) {
+                    if (value > lastPosition) {
+                        lastPosition = value
+                    }
+                }
+                lastPosition >= layoutManager.getItemCount() - 1
+            }
+            else -> false
         }
-        return canLoadMore
     }
 
     /**
