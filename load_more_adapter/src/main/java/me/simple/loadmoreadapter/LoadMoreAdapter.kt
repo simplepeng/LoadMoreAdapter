@@ -26,10 +26,13 @@ class LoadMoreAdapter private constructor(
         /**
          * footer的状态
          */
-        const val STATE_LOADING = 0
-        const val STATE_LOAD_FAILED = 2
-        const val STATE_NO_MORE_DATA = 3
+        const val STATE_IS_LOADING = 0//正在加载更多
+        const val STATE_LOAD_FAILED = 2//加载失败
+        const val STATE_NO_MORE_DATA = 3//没有更多数据
 
+        /**
+         * 包装函数
+         */
         @JvmStatic
         fun wrap(
             adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
@@ -40,12 +43,12 @@ class LoadMoreAdapter private constructor(
     }
 
     /**
-     *
+     * 加载更多的监听
      */
     private var mOnLoadMoreListener: ((adapter: LoadMoreAdapter) -> Unit)? = null
 
     /**
-     *
+     * 加载失败的点击事件
      */
     private var mOnFailedClickListener: ((adapter: LoadMoreAdapter, view: View) -> Unit)? = null
 
@@ -57,7 +60,7 @@ class LoadMoreAdapter private constructor(
     /**
      * 状态
      */
-    private var mStateType = STATE_LOADING
+    private var mStateType = STATE_IS_LOADING
 
     /**
      * 已无更多数据
@@ -108,6 +111,7 @@ class LoadMoreAdapter private constructor(
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
+
         //如果viewType是loadMore
         if (viewType == VIEW_TYPE_LOAD_MORE) {
             val footView = LayoutInflater.from(parent.context)
@@ -139,13 +143,13 @@ class LoadMoreAdapter private constructor(
     ) {
         if (holder is LoadMoreViewHolder) {
             //首次如果itemView没有填充满RecyclerView，继续加载更多
-            if (!mRecyclerView!!.canScrollVertically(-1)
+            if (canScrollVertically()
                 && mOnLoadMoreListener != null
                 && !mNoMoreData
             ) {
                 //fix bug Cannot call this method while RecyclerView is computing a layout or scrolling
                 mRecyclerView?.post {
-                    mStateType = STATE_LOADING
+                    mStateType = STATE_IS_LOADING
                     holder.setState(mStateType)
                     mOnLoadMoreListener?.invoke(this@LoadMoreAdapter)
                 }
@@ -154,7 +158,7 @@ class LoadMoreAdapter private constructor(
             //加载失败点击事件
             holder.itemView.setOnClickListener {
                 if (mStateType == STATE_LOAD_FAILED && mOnFailedClickListener != null) {
-                    mStateType = STATE_LOADING
+                    mStateType = STATE_IS_LOADING
                     mOnFailedClickListener?.invoke(this@LoadMoreAdapter, holder.itemView)
                 }
             }
@@ -164,6 +168,13 @@ class LoadMoreAdapter private constructor(
         } else {
             realAdapter.onBindViewHolder(holder, position, payloads)
         }
+    }
+
+    /**
+     * 是否可以垂直滚动
+     */
+    private fun canScrollVertically(): Boolean {
+        return mRecyclerView?.canScrollVertically(-1) ?: false
     }
 
     /**
@@ -215,9 +226,11 @@ class LoadMoreAdapter private constructor(
      *
      */
     override fun onFailedToRecycleView(holder: RecyclerView.ViewHolder): Boolean {
-        return if (holder is LoadMoreViewHolder) false else realAdapter.onFailedToRecycleView(
-            holder
-        )
+        return if (holder is LoadMoreViewHolder) {
+            false
+        } else {
+            realAdapter.onFailedToRecycleView(holder)
+        }
     }
 
     /**
@@ -225,7 +238,7 @@ class LoadMoreAdapter private constructor(
      */
     private val mProxyDataObserver = object : AdapterDataObserver() {
         override fun onChanged() {
-            notifyDataSetChanged()
+            this@LoadMoreAdapter.notifyDataSetChanged()
         }
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
@@ -237,11 +250,11 @@ class LoadMoreAdapter private constructor(
         }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            notifyItemRangeInserted(positionStart, itemCount)
+            this@LoadMoreAdapter.notifyItemRangeInserted(positionStart, itemCount)
         }
 
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            notifyItemRangeRemoved(positionStart, itemCount)
+            this@LoadMoreAdapter.notifyItemRangeRemoved(positionStart, itemCount)
         }
 
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
@@ -278,7 +291,7 @@ class LoadMoreAdapter private constructor(
             ) return
 
             if (canLoadMore(recyclerView.layoutManager)) {
-                loadingMore()
+                startLoadingMore()
                 mOnLoadMoreListener?.invoke(this@LoadMoreAdapter)
             }
         }
@@ -312,10 +325,10 @@ class LoadMoreAdapter private constructor(
     }
 
     /**
-     *
+     * 开始加载更多
      */
-    private fun loadingMore() {
-        setState(STATE_LOADING)
+    private fun startLoadingMore() {
+        setState(STATE_IS_LOADING)
     }
 
     /**
@@ -341,7 +354,7 @@ class LoadMoreAdapter private constructor(
     }
 
     /**
-     *
+     * 设置底部LoadMoreViewHolder的状态
      */
     private fun setState(state: Int) {
         if (mStateType == state) return

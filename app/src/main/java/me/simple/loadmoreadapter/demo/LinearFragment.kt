@@ -2,6 +2,7 @@ package me.simple.loadmoreadapter.demo
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,8 +36,11 @@ class LinearFragment : Fragment() {
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = LinearLayoutManager(activity)
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
+        var count = 1
         loadMoreAdapter?.setOnLoadMoreListener {
             getData()
+            Log.d("LinearFragment", count.toString())
+            count++
         }
         loadMoreAdapter?.setOnFailedClickListener { adapter, view ->
             Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
@@ -54,14 +58,14 @@ class LinearFragment : Fragment() {
     }
 
     private fun getData() {
-        if (mItems.size in 11..14) {
-            loadMoreAdapter!!.loadMoreFailed()
-            return
-        }
-        if (mItems.size >= 5) {
-            loadMoreAdapter!!.noMoreData()
-            return
-        }
+//        if (mItems.size in 11..14) {
+//            loadMoreAdapter!!.loadMoreFailed()
+//            return
+//        }
+//        if (mItems.size >= 5) {
+//            loadMoreAdapter!!.noMoreData()
+//            return
+//        }
         Handler().postDelayed({
             mItems.add("Java")
             mItems.add("C++")

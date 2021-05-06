@@ -3,12 +3,14 @@ package me.simple.loadmoreadapter
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import me.simple.loadmoreadapter.LoadMoreAdapter
 
 /**
  * 底部加载更多的ViewHolder
  */
-internal class LoadMoreViewHolder(itemView: View, private val mFooter: ILoadMoreFooter) : RecyclerView.ViewHolder(itemView), ILoadMore {
+internal class LoadMoreViewHolder(
+    itemView: View,
+    private val mFooter: ILoadMoreFooter
+) : RecyclerView.ViewHolder(itemView), ILoadMore {
 
     init {
         val params = itemView.layoutParams
@@ -22,7 +24,7 @@ internal class LoadMoreViewHolder(itemView: View, private val mFooter: ILoadMore
      */
     fun setState(stateType: Int) {
         when (stateType) {
-            LoadMoreAdapter.STATE_LOADING -> loading()
+            LoadMoreAdapter.STATE_IS_LOADING -> loading()
             LoadMoreAdapter.STATE_LOAD_FAILED -> loadFailed()
             LoadMoreAdapter.STATE_NO_MORE_DATA -> noMoreData()
         }
