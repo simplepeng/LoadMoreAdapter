@@ -70,6 +70,8 @@ class LinearFragment : Fragment() {
             mItems.add("Java")
             mItems.add("C++")
             mItems.add("Python")
+
+//            loadMoreAdapter?.finishLoadMore()
             mAdapter.notifyDataSetChanged()
         }, 1500)
     }

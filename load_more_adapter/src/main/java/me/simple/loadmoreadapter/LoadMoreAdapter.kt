@@ -27,6 +27,7 @@ class LoadMoreAdapter private constructor(
          * footer的状态
          */
         const val STATE_IS_LOADING = 0//正在加载更多
+        const val STATE_LOAD_FINISHED = 1//完成一次加载更多
         const val STATE_LOAD_FAILED = 2//加载失败
         const val STATE_NO_MORE_DATA = 3//没有更多数据
 
@@ -60,7 +61,7 @@ class LoadMoreAdapter private constructor(
     /**
      * 状态
      */
-    private var mStateType = STATE_IS_LOADING
+    private var mStateType = STATE_LOAD_FINISHED
 
     /**
      * 已无更多数据
@@ -143,10 +144,7 @@ class LoadMoreAdapter private constructor(
     ) {
         if (holder is LoadMoreViewHolder) {
             //首次如果itemView没有填充满RecyclerView，继续加载更多
-            if (canScrollVertically()
-                && mOnLoadMoreListener != null
-                && !mNoMoreData
-            ) {
+            if (mOnLoadMoreListener != null && !mNoMoreData ) {
                 //fix bug Cannot call this method while RecyclerView is computing a layout or scrolling
                 mRecyclerView?.post {
                     mStateType = STATE_IS_LOADING
@@ -158,13 +156,14 @@ class LoadMoreAdapter private constructor(
             //加载失败点击事件
             holder.itemView.setOnClickListener {
                 if (mStateType == STATE_LOAD_FAILED && mOnFailedClickListener != null) {
-                    mStateType = STATE_IS_LOADING
                     mOnFailedClickListener?.invoke(this@LoadMoreAdapter, holder.itemView)
+                    mStateType = STATE_IS_LOADING
+                    holder.setState(mStateType)
                 }
             }
 
             //更新状态
-            holder.setState(mStateType)
+//            holder.setState(mStateType)
         } else {
             realAdapter.onBindViewHolder(holder, position, payloads)
         }
@@ -184,7 +183,7 @@ class LoadMoreAdapter private constructor(
         this.mRecyclerView = recyclerView
         setFullSpan(recyclerView)
         realAdapter.registerAdapterDataObserver(mProxyDataObserver)
-        recyclerView.addOnScrollListener(mOnScrollListener)
+//        recyclerView.addOnScrollListener(mOnScrollListener)
         realAdapter.onAttachedToRecyclerView(recyclerView)
     }
 
@@ -194,7 +193,7 @@ class LoadMoreAdapter private constructor(
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         this.mRecyclerView = null
         realAdapter.unregisterAdapterDataObserver(mProxyDataObserver)
-        recyclerView.removeOnScrollListener(mOnScrollListener)
+//        recyclerView.removeOnScrollListener(mOnScrollListener)
         realAdapter.onDetachedFromRecyclerView(recyclerView)
     }
 
@@ -329,6 +328,13 @@ class LoadMoreAdapter private constructor(
      */
     private fun startLoadingMore() {
         setState(STATE_IS_LOADING)
+    }
+
+    /**
+     * 完成一次加载更多
+     */
+    fun finishLoadMore() {
+        setState(STATE_LOAD_FINISHED)
     }
 
     /**
