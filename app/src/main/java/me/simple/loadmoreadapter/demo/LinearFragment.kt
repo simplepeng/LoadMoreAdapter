@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import me.drakeet.multitype.Items
 import me.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
@@ -19,6 +20,7 @@ class LinearFragment : Fragment() {
     var mItems = Items()
     var mAdapter = MultiTypeAdapter(mItems)
     var loadMoreAdapter: LoadMoreAdapter? = null
+    var count = 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,12 +33,23 @@ class LinearFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
+        refreshLayout.setOnRefreshListener {
+            refreshLayout.isRefreshing = false
+            mItems.clear()
+            mAdapter.notifyDataSetChanged()
+
+            count = 1
+            getData()
+        }
+
         mAdapter.register(String::class.java, LinearItemBinder())
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = LinearLayoutManager(activity)
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
-        var count = 1
+
+
         loadMoreAdapter?.setOnLoadMoreListener {
             if (count == 2) {
                 loadMoreAdapter?.loadMoreFailed()
@@ -56,40 +69,35 @@ class LinearFragment : Fragment() {
         getData()
     }
 
-    private fun failedClick(){
+    private fun failedClick() {
         Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
-        Handler().postDelayed({
+        view?.postDelayed({
             mItems.add("1")
             mItems.add("2")
             mItems.add("3")
             mItems.add("4")
             mItems.add("5")
             mItems.add("6")
+
+            loadMoreAdapter?.finishLoadMore()
             mAdapter.notifyItemRangeInserted(mItems.size - 6, 6)
-        },1500)
+        }, 1500)
     }
 
     private fun getData() {
-        if (mItems.size >= 45) {
+        if (mItems.size >= 25) {
             loadMoreAdapter!!.noMoreData()
             return
         }
 
-        Handler().postDelayed({
+        view?.postDelayed({
             val item = mutableListOf<String>()
             item.add("Java")
             item.add("C++")
             item.add("Python")
-            item.add("Java")
-            item.add("C++")
-            item.add("Python")
-            item.add("Java")
-            item.add("C++")
-            item.add("Python")
-            item.add("Java")
-            item.add("C++")
             mItems.addAll(item)
 
+            loadMoreAdapter?.finishLoadMore()
 //            mAdapter.notifyDataSetChanged()
             mAdapter.notifyItemRangeChanged(mItems.size - item.size, item.size)
         }, 1500)

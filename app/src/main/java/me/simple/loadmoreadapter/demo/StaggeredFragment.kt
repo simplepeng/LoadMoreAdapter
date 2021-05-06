@@ -57,6 +57,7 @@ class StaggeredFragment : Fragment() {
             item.add("")
             mItems.addAll(item)
 
+            loadMoreAdapter?.finishLoadMore()
             mAdapter.notifyItemRangeInserted(mItems.size - item.size, item.size)
 //            mAdapter.notifyDataSetChanged()
 
