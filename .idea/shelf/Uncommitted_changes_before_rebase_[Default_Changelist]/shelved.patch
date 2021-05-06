@@ -1,0 +1,18 @@
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\n    id 'com.android.application'\n    id 'kotlin-android'\n}\n\nandroid {\n    compileSdkVersion 28\n    defaultConfig {\n        applicationId \"me.simple.loadmoreadapter.demo\"\n        minSdkVersion 14\n        targetSdkVersion 28\n        versionCode 1\n        versionName \"1.0\"\n    }\n    kotlinOptions {\n        jvmTarget = \"1.8\"\n    }\n}\n\ndependencies {\n    implementation fileTree(dir: 'libs', include: ['*.jar'])\n    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version\"\n    implementation 'androidx.appcompat:appcompat:1.0.0'\n    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'\n\n    implementation 'me.drakeet.multitype:multitype:3.4.4'\n\n    implementation 'com.google.android.material:material:1.0.0'\n\n    implementation project(path: ':load_more_adapter')\n//    implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.2'\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision ed4b025c251c04c4b20ce404b71ec324296d7dca)
++++ app/build.gradle	(date 1617004216000)
+@@ -27,6 +27,6 @@
+ 
+     implementation 'com.google.android.material:material:1.0.0'
+ 
+-    implementation project(path: ':load_more_adapter')
+-//    implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.2'
++//    implementation project(path: ':load_more_adapter')
++    implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.3'
+ }
