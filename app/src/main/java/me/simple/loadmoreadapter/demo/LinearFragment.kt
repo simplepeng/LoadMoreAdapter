@@ -38,12 +38,27 @@ class LinearFragment : Fragment() {
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
         var count = 1
         loadMoreAdapter?.setOnLoadMoreListener {
+            if (count == 2) {
+                loadMoreAdapter?.loadMoreFailed()
+                return@setOnLoadMoreListener
+            }
+
             getData()
             Log.d("LinearFragment", count.toString())
             count++
         }
         loadMoreAdapter?.setOnFailedClickListener { adapter, view ->
-            Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
+            failedClick()
+            count++
+        }
+        rv.adapter = loadMoreAdapter
+
+        getData()
+    }
+
+    private fun failedClick(){
+        Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
+        Handler().postDelayed({
             mItems.add("1")
             mItems.add("2")
             mItems.add("3")
@@ -51,28 +66,32 @@ class LinearFragment : Fragment() {
             mItems.add("5")
             mItems.add("6")
             mAdapter.notifyItemRangeInserted(mItems.size - 6, 6)
-        }
-        rv.adapter = loadMoreAdapter
-
-        getData()
+        },1500)
     }
 
     private fun getData() {
-//        if (mItems.size in 11..14) {
-//            loadMoreAdapter!!.loadMoreFailed()
-//            return
-//        }
-//        if (mItems.size >= 5) {
-//            loadMoreAdapter!!.noMoreData()
-//            return
-//        }
-        Handler().postDelayed({
-            mItems.add("Java")
-            mItems.add("C++")
-            mItems.add("Python")
+        if (mItems.size >= 45) {
+            loadMoreAdapter!!.noMoreData()
+            return
+        }
 
-//            loadMoreAdapter?.finishLoadMore()
-            mAdapter.notifyDataSetChanged()
+        Handler().postDelayed({
+            val item = mutableListOf<String>()
+            item.add("Java")
+            item.add("C++")
+            item.add("Python")
+            item.add("Java")
+            item.add("C++")
+            item.add("Python")
+            item.add("Java")
+            item.add("C++")
+            item.add("Python")
+            item.add("Java")
+            item.add("C++")
+            mItems.addAll(item)
+
+//            mAdapter.notifyDataSetChanged()
+            mAdapter.notifyItemRangeChanged(mItems.size - item.size, item.size)
         }, 1500)
     }
 }

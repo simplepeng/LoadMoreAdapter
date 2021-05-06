@@ -1,5 +1,6 @@
 package me.simple.loadmoreadapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +28,8 @@ class LoadMoreAdapter private constructor(
          * footer的状态
          */
         const val STATE_IS_LOADING = 0//正在加载更多
-        const val STATE_LOAD_FINISHED = 1//完成一次加载更多
+
+        //        const val STATE_LOAD_FINISHED = 1//完成一次加载更多
         const val STATE_LOAD_FAILED = 2//加载失败
         const val STATE_NO_MORE_DATA = 3//没有更多数据
 
@@ -61,7 +63,7 @@ class LoadMoreAdapter private constructor(
     /**
      * 状态
      */
-    private var mStateType = STATE_LOAD_FINISHED
+    private var mStateType = STATE_IS_LOADING
 
     /**
      * 已无更多数据
@@ -142,9 +144,15 @@ class LoadMoreAdapter private constructor(
         position: Int,
         payloads: List<Any>
     ) {
+        //如果是加载更多的VH执行onBind
         if (holder is LoadMoreViewHolder) {
-            //首次如果itemView没有填充满RecyclerView，继续加载更多
-            if (mOnLoadMoreListener != null && !mNoMoreData ) {
+            //如果是加载失败或无更多数据
+            if (mStateType != STATE_IS_LOADING) {
+                holder.setState(mStateType)
+                return
+            }
+
+            if (mOnLoadMoreListener != null && !mNoMoreData) {
                 //fix bug Cannot call this method while RecyclerView is computing a layout or scrolling
                 mRecyclerView?.post {
                     mStateType = STATE_IS_LOADING
@@ -156,17 +164,16 @@ class LoadMoreAdapter private constructor(
             //加载失败点击事件
             holder.itemView.setOnClickListener {
                 if (mStateType == STATE_LOAD_FAILED && mOnFailedClickListener != null) {
-                    mOnFailedClickListener?.invoke(this@LoadMoreAdapter, holder.itemView)
                     mStateType = STATE_IS_LOADING
                     holder.setState(mStateType)
+                    mOnFailedClickListener?.invoke(this@LoadMoreAdapter, holder.itemView)
                 }
             }
-
-            //更新状态
-//            holder.setState(mStateType)
-        } else {
-            realAdapter.onBindViewHolder(holder, position, payloads)
+            return
         }
+
+        //执行正常的onBind
+        realAdapter.onBindViewHolder(holder, position, payloads)
     }
 
     /**
@@ -333,9 +340,9 @@ class LoadMoreAdapter private constructor(
     /**
      * 完成一次加载更多
      */
-    fun finishLoadMore() {
-        setState(STATE_LOAD_FINISHED)
-    }
+//    fun finishLoadMore() {
+//        setState(STATE_LOAD_FINISHED)
+//    }
 
     /**
      * 加载更多失败
