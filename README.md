@@ -84,7 +84,6 @@ loadMoreAdapter.resetNoMoreData();
 ## 版本迭代
 
 * v1.0.4：修复一直loading的bug
-
 * v1.0.3：升级`AndroidX`，`Kotlin`，修复bug
 * v1.0.2：迁移到`jitpack`
 * v1.0.0：首次上传
