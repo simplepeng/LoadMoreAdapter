@@ -8,6 +8,8 @@
 
 ## 导入依赖
 
+[![](https://jitpack.io/v/simplepeng/LoadMoreAdapter.svg)](https://jitpack.io/#simplepeng/LoadMoreAdapter)
+
 ```groovy
 allprojects {
 	repositories {
