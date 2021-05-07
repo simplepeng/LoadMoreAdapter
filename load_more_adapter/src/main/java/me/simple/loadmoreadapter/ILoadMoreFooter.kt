@@ -16,15 +16,15 @@ interface ILoadMoreFooter {
     /**
      * 加载更多中
      */
-    fun loading()
+    fun loading(footerView: View)
 
     /**
      * 加载完成-已无更多数据
      */
-    fun noMoreData()
+    fun noMoreData(footerView: View)
 
     /**
      * 加载失败
      */
-    fun loadFailed()
+    fun loadFailed(footerView: View)
 }

@@ -39,6 +39,7 @@ class LinearFragment : Fragment() {
             mItems.clear()
             mAdapter.notifyDataSetChanged()
 
+            loadMoreAdapter?.resetNoMoreData()
             count = 1
             getData()
         }
@@ -51,13 +52,13 @@ class LinearFragment : Fragment() {
 
 
         loadMoreAdapter?.setOnLoadMoreListener {
-            if (count == 2) {
-                loadMoreAdapter?.loadMoreFailed()
-                return@setOnLoadMoreListener
-            }
+//            if (count == 2) {
+//                loadMoreAdapter?.loadMoreFailed()
+//                return@setOnLoadMoreListener
+//            }
 
             getData()
-            Log.d("LinearFragment", count.toString())
+//            Log.d("LinearFragment", count.toString())
             count++
         }
         loadMoreAdapter?.setOnFailedClickListener { adapter, view ->
@@ -85,7 +86,7 @@ class LinearFragment : Fragment() {
     }
 
     private fun getData() {
-        if (mItems.size >= 25) {
+        if (mItems.size >= 15) {
             loadMoreAdapter!!.noMoreData()
             return
         }

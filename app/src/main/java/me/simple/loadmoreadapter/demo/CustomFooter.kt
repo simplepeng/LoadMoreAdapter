@@ -16,15 +16,15 @@ class CustomFooter : ILoadMoreFooter {
         mTextView = footerView.findViewById(R.id.tv_custom)
     }
 
-    override fun loading() {
+    override fun loading(footerView: View) {
         mTextView!!.text = "加载更多中..."
     }
 
-    override fun noMoreData() {
+    override fun noMoreData(footerView: View) {
         mTextView!!.text = "我是有底线的"
     }
 
-    override fun loadFailed() {
+    override fun loadFailed(footerView: View) {
         mTextView!!.text = "服务器开了小差"
     }
 }

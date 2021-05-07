@@ -1,6 +1,5 @@
 package me.simple.loadmoreadapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,41 +73,30 @@ class LoadMoreAdapter private constructor(
      */
     private var mRecyclerView: RecyclerView? = null
 
-    /**
-     *
-     */
     override fun getItemCount(): Int {
         val count = realAdapter.itemCount
         return if (count > 0) (count + 1) else 0
     }
 
-    /**
-     *
-     */
     override fun getItemId(position: Int): Long {
-        if (position == 0) return realAdapter.getItemId(position)
+//        if (position == 0) return realAdapter.getItemId(position)
 
-        return if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE) {
+        return if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE)
             VIEW_TYPE_LOAD_MORE.toLong()
-        } else {
+        else
             realAdapter.getItemId(position)
-        }
+
     }
 
-    /**
-     *
-     */
     override fun getItemViewType(position: Int): Int {
-        if (position <= 0) return super.getItemViewType(position)
+//        if (position <= 0) return super.getItemViewType(position)
 
-        return if (position == itemCount - 1) {
+        return if (position == itemCount - 1)
             VIEW_TYPE_LOAD_MORE
-        } else realAdapter.getItemViewType(position)
+        else
+            realAdapter.getItemViewType(position)
     }
 
-    /**
-     *
-     */
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -344,7 +332,6 @@ class LoadMoreAdapter private constructor(
      */
     fun finishLoadMore() {
         mStateType = STATE_NORMAL
-//        setState(STATE_LOAD_FINISHED)
     }
 
     /**
@@ -366,6 +353,7 @@ class LoadMoreAdapter private constructor(
      * 重置状态
      */
     fun resetNoMoreData() {
+        mStateType = STATE_NORMAL
         mNoMoreData = false
     }
 

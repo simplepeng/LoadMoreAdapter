@@ -31,15 +31,15 @@ internal class LoadMoreViewHolder(
     }
 
     override fun loading() {
-        mFooter.loading()
+        mFooter.loading(itemView)
     }
 
     override fun noMoreData() {
-        mFooter.noMoreData()
+        mFooter.noMoreData(itemView)
     }
 
     override fun loadFailed() {
-        mFooter.loadFailed()
+        mFooter.loadFailed(itemView)
     }
 
 

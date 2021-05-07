@@ -33,23 +33,28 @@ class GridFragment : Fragment() {
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = GridLayoutManager(activity, 3)
+
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter, CustomFooter())
             .setOnLoadMoreListener {
                 addData()
             }
         rv.adapter = loadMoreAdapter
+
         addData()
     }
 
     private fun addData() {
-        Handler().postDelayed({
+        view?.postDelayed({
             mItems.add("")
             mItems.add("")
             mItems.add("")
             mItems.add("")
             mItems.add("")
             mItems.add("")
+
+            loadMoreAdapter?.finishLoadMore()
             mAdapter.notifyItemRangeInserted(mItems.size - 5, 5)
+
             if (mItems.size > 25) {
                 loadMoreAdapter!!.noMoreData()
             }

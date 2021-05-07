@@ -9,32 +9,37 @@ import android.widget.TextView
  */
 internal class LoadMoreFooter : ILoadMoreFooter {
 
-    private var mProgressBar: ProgressBar? = null
-    private var mTextView: TextView? = null
-
-    override fun setLayoutRes(): Int {
-        return R.layout.adapter_load_more
-    }
+    override fun setLayoutRes() =  R.layout.adapter_load_more
 
     override fun onCreate(footerView: View) {
-        mProgressBar = footerView.findViewById(R.id.load_more_pb)
-        mTextView = footerView.findViewById(R.id.load_more_tv)
     }
 
-    override fun loading() {
-        mProgressBar!!.visibility = View.VISIBLE
-        mTextView!!.visibility = View.GONE
+    override fun loading(footerView: View) {
+        footerView.findViewById<ProgressBar>(R.id.load_more_pb)?.apply {
+            visibility = View.VISIBLE
+        }
+        footerView.findViewById<TextView>(R.id.load_more_tv)?.apply {
+            visibility = View.GONE
+        }
     }
 
-    override fun noMoreData() {
-        mProgressBar!!.visibility = View.GONE
-        mTextView!!.visibility = View.VISIBLE
-        mTextView!!.text = "已无更多数据"
+    override fun noMoreData(footerView: View) {
+        footerView.findViewById<ProgressBar>(R.id.load_more_pb)?.apply {
+            visibility = View.GONE
+        }
+        footerView.findViewById<TextView>(R.id.load_more_tv)?.apply {
+            visibility = View.VISIBLE
+            text = "已无更多数据"
+        }
     }
 
-    override fun loadFailed() {
-        mProgressBar!!.visibility = View.GONE
-        mTextView!!.visibility = View.VISIBLE
-        mTextView!!.text = "加载失败"
+    override fun loadFailed(footerView: View) {
+        footerView.findViewById<ProgressBar>(R.id.load_more_pb)?.apply {
+            visibility = View.GONE
+        }
+        footerView.findViewById<TextView>(R.id.load_more_tv)?.apply {
+            visibility = View.VISIBLE
+            text = "加载失败"
+        }
     }
 }
