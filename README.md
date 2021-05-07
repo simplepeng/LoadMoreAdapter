@@ -19,7 +19,7 @@ allprojects {
 
 ```groovy
 dependencies {
-        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.3'
+        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.4'
 }
 ```
 
@@ -51,15 +51,15 @@ class CustomFooter : ILoadMoreFooter {
         mTextView = footerView.findViewById(R.id.tv_custom)
     }
 
-    override fun loading() {
+    override fun loading(footerView: View) {
         mTextView!!.text = "加载更多中..."
     }
 
-    override fun noMoreData() {
+    override fun noMoreData(footerView: View) {
         mTextView!!.text = "我是有底线的"
     }
 
-    override fun loadFailed() {
+    override fun loadFailed(footerView: View) {
         mTextView!!.text = "服务器开了小差"
     }
 }
@@ -82,6 +82,8 @@ loadMoreAdapter.resetNoMoreData();
 ```
 
 ## 版本迭代
+
+* v1.0.4：修复一直loading的bug
 
 * v1.0.3：升级`AndroidX`，`Kotlin`，修复bug
 * v1.0.2：迁移到`jitpack`
