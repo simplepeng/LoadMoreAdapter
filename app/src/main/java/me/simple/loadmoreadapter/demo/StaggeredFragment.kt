@@ -34,21 +34,28 @@ class StaggeredFragment : Fragment() {
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
         val refreshLayout: SwipeRefreshLayout = view.findViewById(R.id.refreshLayout)
+
         rv.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter).setOnLoadMoreListener {
             getData()
         }
         rv.adapter = loadMoreAdapter
+
         refreshLayout.setOnRefreshListener {
-            loadMoreAdapter!!.resetNoMoreData()
+            refreshLayout.isRefreshing = false
+
             mItems.clear()
+            mAdapter.notifyDataSetChanged()
+
+            loadMoreAdapter?.resetNoMoreData()
             getData()
         }
+
         getData()
     }
 
     private fun getData() {
-        Handler().postDelayed({ //                loadMoreAdapter.loadComplete();
+        view?.postDelayed({
             val item = mutableListOf<String>()
             item.add("")
             item.add("")
@@ -62,7 +69,7 @@ class StaggeredFragment : Fragment() {
 //            mAdapter.notifyDataSetChanged()
 
             if (mItems.size >= 30) {
-                loadMoreAdapter!!.noMoreData()
+                loadMoreAdapter?.noMoreData()
             }
         }, 1500)
     }

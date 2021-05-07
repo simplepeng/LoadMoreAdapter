@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import me.drakeet.multitype.Items
 import me.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
@@ -40,20 +41,32 @@ class GridFragment : Fragment() {
             }
         rv.adapter = loadMoreAdapter
 
+        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
+        refreshLayout.setOnRefreshListener {
+            refreshLayout.isRefreshing = false
+
+            mItems.clear()
+            mAdapter.notifyDataSetChanged()
+
+            loadMoreAdapter?.resetNoMoreData()
+            addData()
+        }
+
         addData()
     }
 
     private fun addData() {
         view?.postDelayed({
-            mItems.add("")
-            mItems.add("")
-            mItems.add("")
-            mItems.add("")
-            mItems.add("")
-            mItems.add("")
+            val item = mutableListOf<String>()
+            item.add("")
+            item.add("")
+            item.add("")
+            item.add("")
+            item.add("")
+            mItems.addAll(item)
 
             loadMoreAdapter?.finishLoadMore()
-            mAdapter.notifyItemRangeInserted(mItems.size - 5, 5)
+            mAdapter.notifyItemRangeInserted(mItems.size - item.size, item.size)
 
             if (mItems.size > 25) {
                 loadMoreAdapter!!.noMoreData()
