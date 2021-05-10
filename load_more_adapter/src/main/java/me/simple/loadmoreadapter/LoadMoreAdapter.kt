@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import java.util.*
 
-class LoadMoreAdapter private constructor(
-    private val realAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
+class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
+    private val realAdapter: RecyclerView.Adapter<VH>,
     private val footer: ILoadMoreFooter = LoadMoreFooter()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -35,10 +35,10 @@ class LoadMoreAdapter private constructor(
          * 包装函数
          */
         @JvmStatic
-        fun wrap(
-            adapter: RecyclerView.Adapter<RecyclerView.ViewHolder>,
+        fun <VH : RecyclerView.ViewHolder> wrap(
+            adapter: RecyclerView.Adapter<VH>,
             footer: ILoadMoreFooter = LoadMoreFooter()
-        ): LoadMoreAdapter {
+        ): LoadMoreAdapter<VH> {
             return LoadMoreAdapter(adapter, footer)
         }
     }
@@ -46,12 +46,12 @@ class LoadMoreAdapter private constructor(
     /**
      * 加载更多的监听
      */
-    private var mOnLoadMoreListener: ((adapter: LoadMoreAdapter) -> Unit)? = null
+    private var mOnLoadMoreListener: ((adapter: LoadMoreAdapter<*>) -> Unit)? = null
 
     /**
      * 加载失败的点击事件
      */
-    private var mOnFailedClickListener: ((adapter: LoadMoreAdapter, view: View) -> Unit)? = null
+    private var mOnFailedClickListener: ((adapter: LoadMoreAdapter<*>, view: View) -> Unit)? = null
 
     /**
      * 是否为上拉
@@ -163,7 +163,7 @@ class LoadMoreAdapter private constructor(
         }
 
         //执行正常的onBind
-        realAdapter.onBindViewHolder(holder, position, payloads)
+        realAdapter.onBindViewHolder(holder as VH, position, payloads)
     }
 
     /**
@@ -199,7 +199,7 @@ class LoadMoreAdapter private constructor(
      */
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
-        realAdapter.onViewAttachedToWindow(holder)
+        realAdapter.onViewAttachedToWindow(holder as VH)
     }
 
     /**
@@ -207,7 +207,7 @@ class LoadMoreAdapter private constructor(
      */
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
-        realAdapter.onViewDetachedFromWindow(holder)
+        realAdapter.onViewDetachedFromWindow(holder as VH)
     }
 
     /**
@@ -215,7 +215,7 @@ class LoadMoreAdapter private constructor(
      */
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
-        realAdapter.onViewRecycled(holder)
+        realAdapter.onViewRecycled(holder as VH)
     }
 
     /**
@@ -225,7 +225,7 @@ class LoadMoreAdapter private constructor(
         return if (holder is LoadMoreViewHolder) {
             false
         } else {
-            realAdapter.onFailedToRecycleView(holder)
+            realAdapter.onFailedToRecycleView(holder as VH)
         }
     }
 
@@ -261,7 +261,7 @@ class LoadMoreAdapter private constructor(
     /**
      * 加载更多的监听
      */
-    fun setOnLoadMoreListener(listener: ((adapter: LoadMoreAdapter) -> Unit)? = null): LoadMoreAdapter {
+    fun setOnLoadMoreListener(listener: ((adapter: LoadMoreAdapter<*>) -> Unit)? = null): LoadMoreAdapter<VH> {
         this.mOnLoadMoreListener = listener
         return this
     }
@@ -269,7 +269,7 @@ class LoadMoreAdapter private constructor(
     /**
      * 加载失败的监听
      */
-    fun setOnFailedClickListener(listener: ((adapter: LoadMoreAdapter, view: View) -> Unit)? = null): LoadMoreAdapter {
+    fun setOnFailedClickListener(listener: ((adapter: LoadMoreAdapter<*>, view: View) -> Unit)? = null): LoadMoreAdapter<VH> {
         mOnFailedClickListener = listener
         return this
     }

@@ -19,7 +19,7 @@ class LinearFragment : Fragment() {
 
     var mItems = Items()
     var mAdapter = MultiTypeAdapter(mItems)
-    var loadMoreAdapter: LoadMoreAdapter? = null
+    var loadMoreAdapter: LoadMoreAdapter<*>? = null
     var count = 1
 
     override fun onCreateView(

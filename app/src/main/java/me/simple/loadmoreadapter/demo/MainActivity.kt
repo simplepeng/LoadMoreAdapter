@@ -1,11 +1,15 @@
 package me.simple.loadmoreadapter.demo
 
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
+import me.simple.loadmoreadapter.LoadMoreAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,5 +54,28 @@ class MainActivity : AppCompatActivity() {
                 return 3
             }
         }
+
+//        val adapter = Adapter()
+//        val loadMoreAdapter = LoadMoreAdapter.wrap(adapter)
     }
+
+     class Adapter : RecyclerView.Adapter<VH>(){
+         override fun onCreateViewHolder(
+             parent: ViewGroup,
+             viewType: Int
+         ): VH {
+             val itemView:View? = null
+             return VH(itemView!!)
+         }
+
+         override fun onBindViewHolder(holder: VH, position: Int) {
+         }
+
+         override fun getItemCount(): Int {
+             return 0
+         }
+
+     }
+
+    class VH(itemView: View) : RecyclerView.ViewHolder(itemView)
 }
