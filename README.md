@@ -21,7 +21,7 @@ allprojects {
 
 ```groovy
 dependencies {
-        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.4'
+        implementation 'com.github.simplepeng:LoadMoreAdapter:v1.0.5'
 }
 ```
 
@@ -85,6 +85,7 @@ loadMoreAdapter.resetNoMoreData();
 
 ## 版本迭代
 
+* v1.0.5：泛型适配原生的Adapter
 * v1.0.4：修复一直loading的bug
 * v1.0.3：升级`AndroidX`，`Kotlin`，修复bug
 * v1.0.2：迁移到`jitpack`
