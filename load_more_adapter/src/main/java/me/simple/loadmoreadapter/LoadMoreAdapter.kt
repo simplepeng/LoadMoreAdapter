@@ -1,5 +1,6 @@
 package me.simple.loadmoreadapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import java.util.*
 
+@SuppressLint("NotifyDataSetChanged")
 class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     private val realAdapter: RecyclerView.Adapter<VH>,
     private val footer: ILoadMoreFooter = LoadMoreFooter()
@@ -163,15 +165,15 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
         }
 
         //执行正常的onBind
-        realAdapter.onBindViewHolder(holder as VH, position, payloads)
+        realAdapter.onBindViewHolder(castAttachedViewHolder(holder), position, payloads)
     }
 
     /**
      * 是否可以垂直滚动
      */
-    private fun canScrollVertically(): Boolean {
-        return mRecyclerView?.canScrollVertically(-1) ?: false
-    }
+//    private fun canScrollVertically(): Boolean {
+//        return mRecyclerView?.canScrollVertically(-1) ?: false
+//    }
 
     /**
      *
@@ -199,7 +201,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
      */
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
-        realAdapter.onViewAttachedToWindow(holder as VH)
+        realAdapter.onViewAttachedToWindow(castAttachedViewHolder(holder))
     }
 
     /**
@@ -207,7 +209,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
      */
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
-        realAdapter.onViewDetachedFromWindow(holder as VH)
+        realAdapter.onViewDetachedFromWindow(castAttachedViewHolder(holder))
     }
 
     /**
@@ -215,7 +217,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
      */
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         if (holder is LoadMoreViewHolder) return
-        realAdapter.onViewRecycled(holder as VH)
+        realAdapter.onViewRecycled(castAttachedViewHolder(holder))
     }
 
     /**
@@ -225,9 +227,15 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
         return if (holder is LoadMoreViewHolder) {
             false
         } else {
-            realAdapter.onFailedToRecycleView(holder as VH)
+            realAdapter.onFailedToRecycleView(castAttachedViewHolder(holder))
         }
     }
+
+    /**
+     *
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun castAttachedViewHolder(holder: RecyclerView.ViewHolder): VH = holder as VH
 
     /**
      * 代理原来的AdapterDataObserver

@@ -31,7 +31,7 @@ class StaggeredFragment : Fragment() {
         mAdapter.register(String::class.java, GridItemBinder())
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
-        val refreshLayout: SwipeRefreshLayout = view.findViewById(R.id.refreshLayout)
+//        val refreshLayout: SwipeRefreshLayout = view.findViewById(R.id.refreshLayout)
 
         rv.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter).setOnLoadMoreListener {
@@ -39,15 +39,15 @@ class StaggeredFragment : Fragment() {
         }
         rv.adapter = loadMoreAdapter
 
-        refreshLayout.setOnRefreshListener {
-            refreshLayout.isRefreshing = false
-
-            mItems.clear()
-            mAdapter.notifyDataSetChanged()
-
-            loadMoreAdapter?.resetNoMoreData()
-            getData()
-        }
+//        refreshLayout.setOnRefreshListener {
+//            refreshLayout.isRefreshing = false
+//
+//            mItems.clear()
+//            mAdapter.notifyDataSetChanged()
+//
+//            loadMoreAdapter?.resetNoMoreData()
+//            getData()
+//        }
 
         getData()
     }

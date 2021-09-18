@@ -30,16 +30,16 @@ class LinearFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
-        refreshLayout.setOnRefreshListener {
-            refreshLayout.isRefreshing = false
-            mItems.clear()
-            mAdapter.notifyDataSetChanged()
-
-            loadMoreAdapter?.resetNoMoreData()
-            count = 1
-            initData()
-        }
+//        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
+//        refreshLayout.setOnRefreshListener {
+//            refreshLayout.isRefreshing = false
+//            mItems.clear()
+//            mAdapter.notifyDataSetChanged()
+//
+//            loadMoreAdapter?.resetNoMoreData()
+//            count = 1
+//            initData()
+//        }
 
         mAdapter.register(String::class, LinearItemBinder())
 

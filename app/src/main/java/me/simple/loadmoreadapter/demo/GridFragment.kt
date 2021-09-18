@@ -39,16 +39,16 @@ class GridFragment : Fragment() {
             }
         rv.adapter = loadMoreAdapter
 
-        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
-        refreshLayout.setOnRefreshListener {
-            refreshLayout.isRefreshing = false
-
-            mItems.clear()
-            mAdapter.notifyDataSetChanged()
-
-            loadMoreAdapter?.resetNoMoreData()
-            addData()
-        }
+//        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
+//        refreshLayout.setOnRefreshListener {
+//            refreshLayout.isRefreshing = false
+//
+//            mItems.clear()
+//            mAdapter.notifyDataSetChanged()
+//
+//            loadMoreAdapter?.resetNoMoreData()
+//            addData()
+//        }
 
         addData()
     }
