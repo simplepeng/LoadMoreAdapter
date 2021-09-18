@@ -1,8 +1,6 @@
 package me.simple.loadmoreadapter.demo
 
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,7 +39,7 @@ class LinearFragment : Fragment() {
 
             loadMoreAdapter?.resetNoMoreData()
             count = 1
-            getData()
+            initData()
         }
 
         mAdapter.register(String::class.java, LinearItemBinder())
@@ -52,13 +50,7 @@ class LinearFragment : Fragment() {
 
 
         loadMoreAdapter?.setOnLoadMoreListener {
-//            if (count == 2) {
-//                loadMoreAdapter?.loadMoreFailed()
-//                return@setOnLoadMoreListener
-//            }
-
-            getData()
-//            Log.d("LinearFragment", count.toString())
+            addItems()
             count++
         }
         loadMoreAdapter?.setOnFailedClickListener { adapter, view ->
@@ -67,7 +59,7 @@ class LinearFragment : Fragment() {
         }
         rv.adapter = loadMoreAdapter
 
-        getData()
+        initData()
     }
 
     private fun failedClick() {
@@ -85,8 +77,16 @@ class LinearFragment : Fragment() {
         }, 1500)
     }
 
-    private fun getData() {
-        if (mItems.size >= 15) {
+    private fun initData() {
+        view?.postDelayed({
+            mItems.add("Java")
+            mItems.add("Kotlin")
+            mAdapter.notifyDataSetChanged()
+        }, 1000)
+    }
+
+    private fun addItems() {
+        if (mItems.size >= 25) {
             loadMoreAdapter!!.noMoreData()
             return
         }
@@ -95,12 +95,12 @@ class LinearFragment : Fragment() {
             val item = mutableListOf<String>()
             item.add("Java")
             item.add("C++")
-            item.add("Python")
+//            item.add("Python")
             mItems.addAll(item)
 
             loadMoreAdapter?.finishLoadMore()
 //            mAdapter.notifyDataSetChanged()
             mAdapter.notifyItemRangeChanged(mItems.size - item.size, item.size)
-        }, 1500)
+        }, 1000)
     }
 }

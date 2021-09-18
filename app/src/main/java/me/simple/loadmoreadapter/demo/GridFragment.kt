@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import me.drakeet.multitype.Items
-import me.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
 
 class GridFragment : Fragment() {
