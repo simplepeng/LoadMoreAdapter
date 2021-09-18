@@ -1,1 +1,18 @@
 include ':app', ':load_more_adapter'
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        jcenter() // Warning: this repository is going to shut down soon
+        maven { url 'https://jitpack.io' }
+        //内网的私有仓库
+//        maven {
+//            allowInsecureProtocol true
+//            url 'http://192.168.1.66:8082/repository/chenpeng/'
+//        }
+    }
+}
+rootProject.name = "LoadMoreAdapter"
+include ':app'
+include ':load_more_adapter'

@@ -1,7 +1,6 @@
 package me.simple.loadmoreadapter.demo
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
 
 class GridFragment : Fragment() {
 
-    var mItems = Items()
+    var mItems = mutableListOf<Any>()
     var mAdapter = MultiTypeAdapter(mItems)
     var loadMoreAdapter: LoadMoreAdapter<*>? = null
 
@@ -28,7 +28,7 @@ class GridFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mAdapter.register(String::class.java, GridItemBinder())
+        mAdapter.register(String::class, GridItemBinder())
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = GridLayoutManager(activity, 3)

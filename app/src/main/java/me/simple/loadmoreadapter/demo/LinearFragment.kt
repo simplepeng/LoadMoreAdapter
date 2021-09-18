@@ -9,13 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import me.drakeet.multitype.Items
-import me.drakeet.multitype.MultiTypeAdapter
+import com.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
 
 class LinearFragment : Fragment() {
 
-    var mItems = Items()
+    var mItems = mutableListOf<Any>()
     var mAdapter = MultiTypeAdapter(mItems)
     var loadMoreAdapter: LoadMoreAdapter<*>? = null
     var count = 1
@@ -42,7 +41,7 @@ class LinearFragment : Fragment() {
             initData()
         }
 
-        mAdapter.register(String::class.java, LinearItemBinder())
+        mAdapter.register(String::class, LinearItemBinder())
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = LinearLayoutManager(activity)

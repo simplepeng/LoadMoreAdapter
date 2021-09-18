@@ -4,16 +4,21 @@ plugins {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdk 30
+
     defaultConfig {
         applicationId "me.simple.loadmoreadapter.demo"
         minSdkVersion 14
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

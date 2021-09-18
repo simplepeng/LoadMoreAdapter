@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import me.drakeet.multitype.ItemViewBinder
+import com.drakeet.multitype.ItemViewBinder
 
 class GridItemBinder : ItemViewBinder<String, GridItemBinder.VH>() {
 
