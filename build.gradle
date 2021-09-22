@@ -27,6 +27,6 @@ ext {
 
     groupId = "me.simple"
     artifactId = 'load-more-adapter'
-    publishVersion = '1.0.2'
+    publishVersion = '1.0.6'
 
 }
