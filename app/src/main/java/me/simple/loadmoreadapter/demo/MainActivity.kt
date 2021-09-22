@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun getCount(): Int {
-                return 3
+                return 1
             }
         }
 

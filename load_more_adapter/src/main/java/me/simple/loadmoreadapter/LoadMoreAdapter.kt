@@ -1,6 +1,7 @@
 package me.simple.loadmoreadapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,13 +77,12 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     private var mRecyclerView: RecyclerView? = null
 
     override fun getItemCount(): Int {
-        val count = realAdapter.itemCount
-        return if (count > 0) (count + 1) else 0
+        return realAdapter.itemCount + 1
+//        val count = realAdapter.itemCount
+//        return if (count > 0) (count + 1) else 0
     }
 
     override fun getItemId(position: Int): Long {
-//        if (position == 0) return realAdapter.getItemId(position)
-
         return if (getItemViewType(position) == VIEW_TYPE_LOAD_MORE)
             VIEW_TYPE_LOAD_MORE.toLong()
         else
@@ -91,8 +91,6 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     }
 
     override fun getItemViewType(position: Int): Int {
-//        if (position <= 0) return super.getItemViewType(position)
-
         return if (position == itemCount - 1)
             VIEW_TYPE_LOAD_MORE
         else
@@ -133,6 +131,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
         position: Int,
         payloads: List<Any>
     ) {
+        Log.d("LoadMoreAdapter", "onBindViewHolder -- ${holder.adapterPosition}")
         //如果是加载更多的VH执行onBind
         if (holder is LoadMoreViewHolder) {
             //加载失败点击事件
@@ -237,6 +236,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     @Suppress("UNCHECKED_CAST")
     private fun castAttachedViewHolder(holder: RecyclerView.ViewHolder): VH = holder as VH
 
+
     /**
      * 代理原来的AdapterDataObserver
      */
@@ -269,7 +269,9 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     /**
      * 加载更多的监听
      */
-    fun setOnLoadMoreListener(listener: ((adapter: LoadMoreAdapter<*>) -> Unit)? = null): LoadMoreAdapter<VH> {
+    fun setOnLoadMoreListener(
+        listener: ((adapter: LoadMoreAdapter<*>) -> Unit)? = null
+    ): LoadMoreAdapter<VH> {
         this.mOnLoadMoreListener = listener
         return this
     }
@@ -277,7 +279,9 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     /**
      * 加载失败的监听
      */
-    fun setOnFailedClickListener(listener: ((adapter: LoadMoreAdapter<*>, view: View) -> Unit)? = null): LoadMoreAdapter<VH> {
+    fun setOnFailedClickListener(
+        listener: ((adapter: LoadMoreAdapter<*>, view: View) -> Unit)? = null
+    ): LoadMoreAdapter<VH> {
         mOnFailedClickListener = listener
         return this
     }
@@ -371,13 +375,13 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     private fun setState(state: Int) {
         if (mStateType == state) return
         mStateType = state
-        notifyLoadMoreVH()
+        notifyLoadMoreViewHolder()
     }
 
     /**
      *
      */
-    private fun notifyLoadMoreVH() {
+    private fun notifyLoadMoreViewHolder() {
         if (itemCount <= 0) return
         this@LoadMoreAdapter.notifyItemChanged(itemCount - 1)
     }

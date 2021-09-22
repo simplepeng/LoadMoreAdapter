@@ -1,17 +1,20 @@
 package me.simple.loadmoreadapter.demo
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.drakeet.multitype.MultiTypeAdapter
 import me.simple.loadmoreadapter.LoadMoreAdapter
 
+@SuppressLint("NotifyDataSetChanged")
 class LinearFragment : Fragment() {
 
     var mItems = mutableListOf<Any>()
@@ -41,11 +44,20 @@ class LinearFragment : Fragment() {
 //            initData()
 //        }
 
-        mAdapter.register(String::class, LinearItemBinder())
+        mAdapter.register(String::class, LinearItemBinder(onDel = { position ->
+            mItems.removeAt(position)
+            mAdapter.notifyItemRemoved(position)
+        }))
 
         val rv: RecyclerView = view.findViewById(R.id.rv)
         rv.layoutManager = LinearLayoutManager(activity)
         loadMoreAdapter = LoadMoreAdapter.wrap(mAdapter)
+        rv.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            )
+        )
 
 
         loadMoreAdapter?.setOnLoadMoreListener {
@@ -59,6 +71,10 @@ class LinearFragment : Fragment() {
         rv.adapter = loadMoreAdapter
 
         initData()
+
+        view.findViewById<View>(R.id.btnAddItems).setOnClickListener {
+            addItems()
+        }
     }
 
     private fun failedClick() {
@@ -76,12 +92,15 @@ class LinearFragment : Fragment() {
         }, 1500)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun initData() {
-        view?.postDelayed({
-            mItems.add("Java")
-            mItems.add("Kotlin")
-            mAdapter.notifyDataSetChanged()
-        }, 1000)
+//        view?.postDelayed({
+        mItems.clear()
+        mItems.add("Java")
+        mItems.add("Kotlin")
+        mAdapter.notifyDataSetChanged()
+//            loadMoreAdapter?.finishLoadMore()
+//        }, 1000)
     }
 
     private fun addItems() {
@@ -99,7 +118,8 @@ class LinearFragment : Fragment() {
 
             loadMoreAdapter?.finishLoadMore()
 //            mAdapter.notifyDataSetChanged()
-            mAdapter.notifyItemRangeChanged(mItems.size - item.size, item.size)
+//            mAdapter.notifyItemRangeChanged(mItems.size - item.size, item.size)
+            mAdapter.notifyItemRangeInserted(mItems.size - item.size, item.size)
         }, 1000)
     }
 }
