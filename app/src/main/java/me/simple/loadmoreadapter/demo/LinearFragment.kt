@@ -79,6 +79,8 @@ class LinearFragment : Fragment() {
 
     private fun failedClick() {
         Toast.makeText(context, "onFailedClick", Toast.LENGTH_SHORT).show()
+        loadMoreAdapter?.startLoading()
+
         view?.postDelayed({
             mItems.add("1")
             mItems.add("2")
@@ -104,8 +106,13 @@ class LinearFragment : Fragment() {
     }
 
     private fun addItems() {
-        if (mItems.size >= 25) {
+        if (mItems.size >= 15) {
             loadMoreAdapter!!.noMoreData()
+            return
+        }
+
+        if (mItems.size in 8..12) {
+            loadMoreAdapter?.loadMoreFailed()
             return
         }
 
@@ -116,10 +123,10 @@ class LinearFragment : Fragment() {
 //            item.add("Python")
             mItems.addAll(item)
 
-            loadMoreAdapter?.finishLoadMore()
 //            mAdapter.notifyDataSetChanged()
 //            mAdapter.notifyItemRangeChanged(mItems.size - item.size, item.size)
             mAdapter.notifyItemRangeInserted(mItems.size - item.size, item.size)
+            loadMoreAdapter?.finishLoadMore()
         }, 1000)
     }
 }

@@ -63,8 +63,8 @@ class GridFragment : Fragment() {
             item.add("")
             mItems.addAll(item)
 
-            loadMoreAdapter?.finishLoadMore()
             mAdapter.notifyItemRangeInserted(mItems.size - item.size, item.size)
+            loadMoreAdapter?.finishLoadMore()
 
             if (mItems.size > 25) {
                 loadMoreAdapter!!.noMoreData()

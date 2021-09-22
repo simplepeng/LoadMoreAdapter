@@ -299,7 +299,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
             ) return
 
             if (canLoadMore(recyclerView.layoutManager) && mStateType != STATE_IS_LOADING) {
-                startLoadingMore()
+                startLoading()
                 mOnLoadMoreListener?.invoke(this@LoadMoreAdapter)
             }
         }
@@ -335,7 +335,7 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
     /**
      * 开始加载更多
      */
-    private fun startLoadingMore() {
+    fun startLoading() {
         setState(STATE_IS_LOADING)
     }
 
@@ -343,7 +343,8 @@ class LoadMoreAdapter<VH : RecyclerView.ViewHolder> private constructor(
      * 完成一次加载更多
      */
     fun finishLoadMore() {
-        mStateType = STATE_NORMAL
+//        mStateType = STATE_NORMAL
+        setState(STATE_NORMAL)
     }
 
     /**
